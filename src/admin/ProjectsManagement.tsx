@@ -25,7 +25,8 @@ export default function ProjectsManagement() {
     completion: 0,
     year: "2024",
     description: "",
-    image_url: ""
+    image_url: "",
+    media: [] as { url: string; type: 'image' | 'video'; is_main: boolean }[]
   });
 
   const fetchProjects = () => {
@@ -42,19 +43,39 @@ export default function ProjectsManagement() {
 
   const handleAddProject = (e: React.FormEvent) => {
     e.preventDefault();
+    // Ensure at least one main image if media exists
+    const finalMedia = [...newProject.media];
+    if (newProject.image_url && !finalMedia.find(m => m.is_main)) {
+      finalMedia.unshift({ url: newProject.image_url, type: 'image', is_main: true });
+    }
+
     fetch('/api/save_data.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...newProject, type: 'project', action: 'add' })
+      body: JSON.stringify({ ...newProject, media: finalMedia, type: 'project', action: 'add' })
     })
     .then(res => res.json())
     .then(data => {
       if (data.success) {
         setIsAddModalOpen(false);
         fetchProjects();
-        setNewProject({ title: "", category: "Commercial", location: "", status: "Ongoing", completion: 0, year: "2024", description: "", image_url: "" });
+        setNewProject({ title: "", category: "Commercial", location: "", status: "Ongoing", completion: 0, year: "2024", description: "", image_url: "", media: [] });
       }
     });
+  };
+
+  const handleDeleteProject = (id: number) => {
+    if (window.confirm("Are you sure you want to delete this project?")) {
+      fetch('/api/save_data.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, type: 'project', action: 'delete' })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) fetchProjects();
+      });
+    }
   };
 
   const filteredProjects = projects.filter(p => {
@@ -170,7 +191,10 @@ export default function ProjectsManagement() {
                 <Edit2 size={16} className="group-hover/btn:text-admin-orange" />
                 <span className="text-[10px] font-bold uppercase tracking-widest">Edit</span>
               </button>
-              <button className="p-4 hover:bg-red-50 text-red-500 transition-colors flex items-center justify-center gap-2 group/btn">
+              <button 
+                onClick={() => handleDeleteProject(project.id)}
+                className="p-4 hover:bg-red-50 text-red-500 transition-colors flex items-center justify-center gap-2 group/btn"
+              >
                 <Trash2 size={16} />
                 <span className="text-[10px] font-bold uppercase tracking-widest">Delete</span>
               </button>
@@ -233,23 +257,64 @@ export default function ProjectsManagement() {
                     <option value="Completed">Completed</option>
                   </select>
                 </div>
-                <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-widest text-gray-500">Progress (%)</label>
-                  <input 
-                    type="number" 
-                    className="w-full bg-admin-surface border-2 border-admin-black p-3 font-bold uppercase tracking-widest text-sm focus:outline-none focus:bg-white transition-colors"
-                    value={newProject.completion}
-                    onChange={e => setNewProject({...newProject, completion: parseInt(e.target.value)})}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-widest text-gray-500">Completion Year</label>
-                  <input 
-                    type="text" 
-                    className="w-full bg-admin-surface border-2 border-admin-black p-3 font-bold uppercase tracking-widest text-sm focus:outline-none focus:bg-white transition-colors"
-                    value={newProject.year}
-                    onChange={e => setNewProject({...newProject, year: e.target.value})}
-                  />
+                <div className="md:col-span-2 space-y-4">
+                  <div className="flex justify-between items-center">
+                    <label className="text-xs font-bold uppercase tracking-widest text-gray-500">Project Gallery (Photos & Videos)</label>
+                    <button 
+                      type="button"
+                      onClick={() => setNewProject({...newProject, media: [...newProject.media, { url: "", type: "image", is_main: false }]})}
+                      className="text-[10px] font-bold uppercase tracking-widest text-admin-orange hover:text-admin-black"
+                    >
+                      + Add Media
+                    </button>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <div className="flex gap-2">
+                       <input 
+                        placeholder="Main Image URL (This shows on Home Page)"
+                        className="flex-1 bg-admin-surface border-2 border-admin-black p-3 font-bold uppercase tracking-widest text-sm focus:outline-none focus:bg-white transition-colors"
+                        value={newProject.image_url}
+                        onChange={e => setNewProject({...newProject, image_url: e.target.value})}
+                      />
+                    </div>
+                    {newProject.media.map((item, idx) => (
+                      <div key={idx} className="flex gap-2">
+                        <input 
+                          placeholder="Media URL"
+                          className="flex-1 bg-admin-surface border-2 border-admin-black p-3 font-bold uppercase tracking-widest text-sm focus:outline-none focus:bg-white transition-colors"
+                          value={item.url}
+                          onChange={e => {
+                            const updated = [...newProject.media];
+                            updated[idx].url = e.target.value;
+                            setNewProject({...newProject, media: updated});
+                          }}
+                        />
+                        <select 
+                          className="bg-admin-surface border-2 border-admin-black p-3 font-bold uppercase tracking-widest text-xs"
+                          value={item.type}
+                          onChange={e => {
+                            const updated = [...newProject.media];
+                            updated[idx].type = e.target.value as 'image' | 'video';
+                            setNewProject({...newProject, media: updated});
+                          }}
+                        >
+                          <option value="image">Image</option>
+                          <option value="video">Video</option>
+                        </select>
+                        <button 
+                          type="button"
+                          onClick={() => {
+                            const updated = newProject.media.filter((_, i) => i !== idx);
+                            setNewProject({...newProject, media: updated});
+                          }}
+                          className="p-3 text-red-500 border-2 border-admin-black"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
               <div className="flex gap-4 pt-4">
