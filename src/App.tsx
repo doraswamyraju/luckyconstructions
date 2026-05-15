@@ -6,6 +6,7 @@ import ProjectsManagement from "./admin/ProjectsManagement";
 import TestimonialsManagement from "./admin/TestimonialsManagement";
 import BlogManagement from "./admin/BlogManagement";
 import AdminProfile from "./admin/AdminProfile";
+import PortfolioPage from "./pages/PortfolioPage";
 import LoginPage from "./admin/LoginPage";
 
 // Simple Protected Route Component
@@ -20,6 +21,7 @@ export default function App() {
     <Router>
       <Routes>
         <Route path="/" element={<LandingPage />} />
+        <Route path="/portfolio" element={<PortfolioPage />} />
         <Route path="/admin/login" element={<LoginPage />} />
         
         <Route path="/admin" element={

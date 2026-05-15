@@ -24,6 +24,7 @@ export default function ProjectsManagement() {
     status: "Ongoing",
     completion_percentage: 0,
     year: "2024",
+    is_featured: false,
     description: "",
     media: [] as { url: string; type: 'image' | 'video'; is_main: boolean; inputMode?: 'upload' | 'url' }[]
   });
@@ -75,12 +76,6 @@ export default function ProjectsManagement() {
       if (data.success) {
         setIsAddModalOpen(false);
         fetchProjects();
-        setNewProject({
-          title: "",
-          category: "Commercial",
-          location: "",
-          status: "Ongoing",
-          completion_percentage: 0,
           year: "2024",
           description: "",
           media: []

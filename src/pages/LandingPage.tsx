@@ -57,7 +57,11 @@ export default function LandingPage() {
     fetch('/api/get_data.php?type=projects')
       .then(res => res.json())
       .then(data => {
-        if (!data.error) setDbProjects(data);
+        if (!data.error) {
+          // Only show top 3 featured projects on landing page
+          const featured = data.filter((p: any) => p.is_featured == 1).slice(0, 3);
+          setDbProjects(featured);
+        }
       })
       .catch(err => console.error("Error fetching projects:", err));
 
@@ -562,10 +566,14 @@ export default function LandingPage() {
             )}
           </div>
           
-          <div className="mt-16 text-center">
-             <button className="border border-white/20 px-8 py-4 text-white font-bold uppercase tracking-wider hover:bg-brand-gold hover:text-brand-black hover:border-brand-gold transition-colors inline-flex items-center gap-2">
-                View Full Portfolio
-             </button>
+          <div className="mt-20 text-center">
+            <Link 
+              to="/portfolio"
+              className="inline-flex items-center gap-3 px-12 py-5 bg-transparent border-2 border-white text-white font-bold uppercase tracking-[0.3em] text-xs hover:bg-white hover:text-black transition-all group"
+            >
+              View Full Portfolio
+              <ChevronRight size={18} className="group-hover:translate-x-2 transition-transform" />
+            </Link>
           </div>
         </div>
 
