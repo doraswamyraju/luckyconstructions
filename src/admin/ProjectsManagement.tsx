@@ -25,7 +25,7 @@ export default function ProjectsManagement() {
     completion_percentage: 0,
     year: "2024",
     description: "",
-    media: [] as { url: string; type: 'image' | 'video'; is_main: boolean }[]
+    media: [] as { url: string; type: 'image' | 'video'; is_main: boolean; inputMode?: 'upload' | 'url' }[]
   });
 
   const fetchProjects = () => {
@@ -43,7 +43,7 @@ export default function ProjectsManagement() {
   const handleAddMedia = () => {
     setNewProject({
       ...newProject,
-      media: [...newProject.media, { url: "", type: "image", is_main: newProject.media.length === 0 }]
+      media: [...newProject.media, { url: "", type: "image", is_main: newProject.media.length === 0, inputMode: 'upload' }]
     });
   };
 
@@ -359,33 +359,56 @@ export default function ProjectsManagement() {
                             <option value="video">Video</option>
                           </select>
                           
-                          <div className="flex-1 flex gap-2">
-                            {item.url ? (
-                              <div className="flex-1 flex items-center gap-2 bg-white border-2 border-admin-black p-2 text-[10px] font-bold text-green-600 truncate">
-                                <span>READY: {item.url}</span>
-                              </div>
-                            ) : (
+                          <div className="flex-1 space-y-2">
+                            <div className="flex gap-2 p-1 bg-white border border-admin-border w-fit">
+                              <button 
+                                type="button"
+                                onClick={() => handleMediaChange(idx, 'inputMode', 'upload')}
+                                className={`px-3 py-1 text-[9px] font-black uppercase tracking-widest transition-colors ${!item.inputMode || item.inputMode === 'upload' ? 'bg-admin-black text-white' : 'text-gray-400 hover:text-admin-black'}`}
+                              >
+                                Upload
+                              </button>
+                              <button 
+                                type="button"
+                                onClick={() => handleMediaChange(idx, 'inputMode', 'url')}
+                                className={`px-3 py-1 text-[9px] font-black uppercase tracking-widest transition-colors ${item.inputMode === 'url' ? 'bg-admin-black text-white' : 'text-gray-400 hover:text-admin-black'}`}
+                              >
+                                URL
+                              </button>
+                            </div>
+
+                            {item.inputMode === 'url' ? (
                               <input 
-                                type="file"
-                                accept={item.type === 'image' ? "image/*" : "video/*"}
-                                className="flex-1 bg-white border-2 border-admin-black p-2 font-bold uppercase tracking-widest text-[10px] file:hidden cursor-pointer"
-                                onChange={async (e) => {
-                                  const file = e.target.files?.[0];
-                                  if (!file) return;
-                                  
-                                  const formData = new FormData();
-                                  formData.append('file', file);
-                                  
-                                  const res = await fetch('/api/upload.php', {
-                                    method: 'POST',
-                                    body: formData
-                                  });
-                                  const data = await res.json();
-                                  if (data.success) {
-                                    handleMediaChange(idx, 'url', data.url);
-                                  }
-                                }}
+                                type="text" 
+                                placeholder="Paste Image/Video URL here..."
+                                className="w-full bg-white border-2 border-admin-black p-2 font-bold uppercase tracking-widest text-[10px] focus:border-admin-orange outline-none"
+                                value={item.url}
+                                onChange={e => handleMediaChange(idx, 'url', e.target.value)}
                               />
+                            ) : (
+                              <div className="flex-1 flex gap-2">
+                                {item.url ? (
+                                  <div className="flex-1 flex items-center justify-between gap-2 bg-white border-2 border-admin-black p-2 text-[10px] font-bold text-green-600">
+                                    <span className="truncate">READY: {item.url}</span>
+                                    <button onClick={() => handleMediaChange(idx, 'url', '')} className="text-gray-400 hover:text-red-500">Change</button>
+                                  </div>
+                                ) : (
+                                  <input 
+                                    type="file"
+                                    accept={item.type === 'image' ? "image/*" : "video/*"}
+                                    className="flex-1 bg-white border-2 border-admin-black p-2 font-bold uppercase tracking-widest text-[10px] file:hidden cursor-pointer"
+                                    onChange={async (e) => {
+                                      const file = e.target.files?.[0];
+                                      if (!file) return;
+                                      const formData = new FormData();
+                                      formData.append('file', file);
+                                      const res = await fetch('/api/upload.php', { method: 'POST', body: formData });
+                                      const data = await res.json();
+                                      if (data.success) handleMediaChange(idx, 'url', data.url);
+                                    }}
+                                  />
+                                )}
+                              </div>
                             )}
                           </div>
 
