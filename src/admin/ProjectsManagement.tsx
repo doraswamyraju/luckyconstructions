@@ -220,11 +220,7 @@ export default function ProjectsManagement() {
               </div>
             </div>
 
-            <div className="border-t-2 border-admin-black grid grid-cols-3 divide-x-2 divide-admin-black">
-              <button className="p-4 hover:bg-admin-surface transition-colors flex items-center justify-center gap-2 group/btn">
-                <Eye size={16} className="group-hover/btn:text-admin-orange" />
-                <span className="text-[10px] font-bold uppercase tracking-widest">View</span>
-              </button>
+            <div className="border-t-2 border-admin-black grid grid-cols-2 divide-x-2 divide-admin-black">
               <button 
                 onClick={() => {
                   setNewProject({
