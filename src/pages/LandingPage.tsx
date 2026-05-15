@@ -626,25 +626,29 @@ export default function LandingPage() {
                           Project ID: LC-00{selectedProject.id}
                         </span>
                       </div>
-                      <h3 className="text-4xl md:text-5xl font-display font-bold uppercase leading-tight tracking-tighter mb-6">
+
+                      <h3 className="text-2xl md:text-3xl font-display font-bold uppercase tracking-tight leading-[1.1]">
                         {selectedProject.title}
                       </h3>
-                      <div className="space-y-6 mb-10 text-gray-600 leading-relaxed">
-                        <p>{selectedProject.description || "Lucky Constructions delivered this project with a focus on structural integrity and architectural finesse. Every detail was meticulously planned and executed by our senior engineering team."}</p>
+
+                      <div className="space-y-4">
+                        <p className="text-gray-600 text-sm leading-relaxed">
+                          {selectedProject.description || "Lucky Constructions delivered this project with a focus on structural integrity and architectural finesse. Every detail was meticulously planned and executed by our senior engineering team."}
+                        </p>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-8 border-t border-gray-100 pt-8">
+                      <div className="grid grid-cols-2 gap-8 pt-8 border-t border-gray-100">
                         <div>
-                          <div className="text-[10px] font-bold uppercase tracking-widest text-brand-gold mb-2">Location</div>
-                          <div className="flex items-center gap-2 font-bold text-sm uppercase tracking-tight">
-                            <MapPin size={16} className="text-brand-gold" />
+                          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Location</p>
+                          <div className="flex items-center gap-2 font-bold text-xs">
+                            <MapPin size={14} className="text-brand-gold" />
                             {selectedProject.location}
                           </div>
                         </div>
                         <div>
-                          <div className="text-[10px] font-bold uppercase tracking-widest text-brand-gold mb-2">Completion</div>
-                          <div className="flex items-center gap-2 font-bold text-sm uppercase tracking-tight">
-                            <Clock size={16} className="text-brand-gold" />
+                          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Completion</p>
+                          <div className="flex items-center gap-2 font-bold text-xs">
+                            <Clock size={14} className="text-brand-gold" />
                             {selectedProject.status === 'Completed' ? selectedProject.year : `${selectedProject.completion_percentage}% Done`}
                           </div>
                         </div>
