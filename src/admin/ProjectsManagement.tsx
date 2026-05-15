@@ -82,19 +82,38 @@ export default function ProjectsManagement() {
 
   const handleSaveProjectManually = (id: number, updates: any) => {
     const project = projects.find(p => p.id === id);
-    if (!project) return;
+    if (!project) {
+      console.error("Project not found for manual update:", id);
+      return;
+    }
+    
+    // Explicitly handle is_featured as a number (0 or 1)
+    const processedUpdates = { ...updates };
+    if ('is_featured' in processedUpdates) {
+      processedUpdates.is_featured = Number(processedUpdates.is_featured);
+    }
+
     fetch('/api/save_data.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 
         type: 'projects', 
         action: 'update', 
-        data: { ...project, ...updates } 
+        data: { ...project, ...processedUpdates } 
       })
     })
     .then(res => res.json())
     .then(data => {
-      if (data.success) fetchProjects();
+      if (data.success) {
+        fetchProjects();
+      } else {
+        console.error("Save failed:", data.error);
+        alert("Failed to update: " + (data.error || "Unknown error"));
+      }
+    })
+    .catch(err => {
+      console.error("Fetch error:", err);
+      alert("Network error while updating project.");
     });
   };
 
