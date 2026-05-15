@@ -78,6 +78,22 @@ export default function ProjectsManagement() {
         fetchProjects();
       }
     });
+  const handleSaveProjectManually = (id: number, updates: any) => {
+    const project = projects.find(p => p.id === id);
+    if (!project) return;
+    fetch('/api/save_data.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        type: 'projects', 
+        action: 'update', 
+        data: { ...project, ...updates } 
+      })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) fetchProjects();
+    });
   };
 
   const handleDeleteProject = (id: number) => {
