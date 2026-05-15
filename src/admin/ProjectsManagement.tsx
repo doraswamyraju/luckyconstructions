@@ -78,6 +78,8 @@ export default function ProjectsManagement() {
         fetchProjects();
       }
     });
+  };
+
   const handleSaveProjectManually = (id: number, updates: any) => {
     const project = projects.find(p => p.id === id);
     if (!project) return;
