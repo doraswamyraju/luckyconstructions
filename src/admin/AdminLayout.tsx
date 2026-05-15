@@ -78,7 +78,13 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               Settings
             </span>
           </button>
-          <button className="flex items-center gap-4 p-3 w-full text-gray-400 hover:bg-white/5 hover:text-red-500 transition-colors overflow-hidden whitespace-nowrap">
+          <button 
+            onClick={() => {
+              localStorage.removeItem("adminUser");
+              window.location.href = "/admin/login";
+            }}
+            className="flex items-center gap-4 p-3 w-full text-gray-400 hover:bg-white/5 hover:text-red-500 transition-colors overflow-hidden whitespace-nowrap"
+          >
             <LogOut size={20} />
             <span className={`font-bold text-xs uppercase tracking-widest transition-opacity ${isSidebarOpen ? "opacity-100" : "opacity-0"}`}>
               Logout

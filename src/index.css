@@ -13,10 +13,10 @@
   --color-brand-black: #000000;
   --color-brand-white: #ffffff;
   
-  --color-admin-orange: #ff4f00;
-  --color-admin-black: #1a1c1c;
-  --color-admin-surface: #f9f9f9;
-  --color-admin-border: #e2e2e2;
+  --color-admin-orange: #cfaa60; /* Matched to Logo Gold */
+  --color-admin-black: #121212;
+  --color-admin-surface: #fdfdfd;
+  --color-admin-border: #eee;
 }
 
 body {
