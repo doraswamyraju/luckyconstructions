@@ -133,8 +133,8 @@ export default function LandingPage() {
           </div>
           
           <div className="hidden lg:flex items-center gap-4">
-            <Link
-              to="/admin"
+            <button
+              onClick={() => window.location.href = '/admin'}
               className={`p-2 rounded-full border transition-all ${
                 isScrolled 
                   ? "border-gray-200 text-gray-400 hover:text-admin-orange hover:border-admin-orange" 
@@ -567,13 +567,17 @@ export default function LandingPage() {
           </div>
           
           <div className="mt-20 text-center">
-            <Link 
-              to="/portfolio"
-              className="inline-flex items-center gap-3 px-12 py-5 bg-transparent border-2 border-white text-white font-bold uppercase tracking-[0.3em] text-xs hover:bg-white hover:text-black transition-all group"
+            <a 
+              href="/portfolio"
+              onClick={(e) => {
+                e.preventDefault();
+                window.location.href = '/portfolio';
+              }}
+              className="inline-flex items-center gap-4 px-14 py-6 bg-transparent border-2 border-white text-white font-bold uppercase tracking-[0.4em] text-xs hover:bg-white hover:text-black transition-all group no-underline"
             >
               View Full Portfolio
-              <ChevronRight size={18} className="group-hover:translate-x-2 transition-transform" />
-            </Link>
+              <ChevronRight size={20} className="group-hover:translate-x-2 transition-transform" />
+            </a>
           </div>
         </div>
 

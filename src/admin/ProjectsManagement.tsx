@@ -166,24 +166,45 @@ export default function ProjectsManagement() {
       {/* Projects Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         {filteredProjects.map((project) => (
-          <div key={project.id} className="bg-white border-2 border-admin-black flex flex-col group shadow-lg">
-            <div className="p-6 flex-1 space-y-6">
-              <div className="flex justify-between items-start gap-4">
-                <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-1 bg-admin-black text-white">
-                      {project.category}
-                    </span>
-                    <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 border border-admin-black ${
-                      project.status === "Completed" ? "bg-green-100 text-green-800" : "bg-admin-orange/10 text-admin-orange"
-                    }`}>
-                      {project.status}
-                    </span>
-                  </div>
-                  <h3 className="text-xl font-admin-header font-black uppercase tracking-tight text-admin-black leading-tight">
-                    {project.title}
-                  </h3>
+          <div key={project.id} className="bg-white border-2 border-admin-black relative group shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-all">
+            {/* Featured Star Toggle */}
+            <div className="absolute top-4 right-4 z-20">
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const newFeatured = project.is_featured == 1 ? 0 : 1;
+                  handleSaveProjectManually(project.id, { is_featured: newFeatured });
+                }}
+                className={`p-3 rounded-full shadow-2xl border-2 border-admin-black transition-all transform hover:scale-110 active:scale-95 ${project.is_featured == 1 ? 'bg-admin-orange text-white' : 'bg-white text-gray-300 hover:text-admin-orange'}`}
+                title="Feature on Homepage"
+              >
+                <Star size={24} fill={project.is_featured == 1 ? "currentColor" : "none"} />
+              </button>
+            </div>
+
+            <div className="aspect-video bg-gray-100 overflow-hidden relative border-b-2 border-admin-black">
+              <img 
+                src={project.image_url} 
+                alt={project.title}
+                className="w-full h-full object-cover"
+              />
+            </div>
+
+            <div className="p-6 space-y-6">
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-1 bg-admin-black text-white">
+                    {project.category}
+                  </span>
+                  <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 border border-admin-black ${
+                    project.status === "Completed" ? "bg-green-100 text-green-800" : "bg-admin-orange/10 text-admin-orange"
+                  }`}>
+                    {project.status}
+                  </span>
                 </div>
+                <h3 className="text-xl font-admin-header font-black uppercase tracking-tight text-admin-black leading-tight">
+                  {project.title}
+                </h3>
               </div>
 
               <div className="space-y-3">
