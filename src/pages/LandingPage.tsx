@@ -599,14 +599,14 @@ export default function LandingPage() {
                     {selectedProject.media && selectedProject.media.length > 0 ? (
                       selectedProject.media.map((m: any, i: number) => (
                         <div key={i} className="relative group">
-                          {m.media_type === 'video' ? (
+                          {m.type === 'video' ? (
                             <div className="aspect-video bg-black flex items-center justify-center group">
                                <video controls className="w-full h-full object-contain">
-                                 <source src={m.media_url} type="video/mp4" />
+                                 <source src={m.url} type="video/mp4" />
                                </video>
                             </div>
                           ) : (
-                            <img src={m.media_url} alt={`Project media ${i}`} className="w-full h-auto object-cover" />
+                            <img src={m.url} alt={`Project media ${i}`} className="w-full h-auto object-cover" />
                           )}
                         </div>
                       ))
