@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { 
   Search, 
   Filter, 
@@ -7,10 +7,10 @@ import {
   Trash2, 
   Eye, 
   MapPin, 
-  Building2 
+  Building2,
+  X,
+  Star
 } from "lucide-react";
-
-// Live data from API replaces mock constants
 
 export default function ProjectsManagement() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -22,10 +22,9 @@ export default function ProjectsManagement() {
     category: "Commercial",
     location: "",
     status: "Ongoing",
-    completion: 0,
+    completion_percentage: 0,
     year: "2024",
     description: "",
-    image_url: "",
     media: [] as { url: string; type: 'image' | 'video'; is_main: boolean }[]
   });
 
@@ -37,29 +36,49 @@ export default function ProjectsManagement() {
       });
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     fetchProjects();
   }, []);
 
-  const handleAddProject = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Ensure at least one main image if media exists
-    const finalMedia = [...newProject.media];
-    if (newProject.image_url && !finalMedia.find(m => m.is_main)) {
-      finalMedia.unshift({ url: newProject.image_url, type: 'image', is_main: true });
-    }
+  const handleAddMedia = () => {
+    setNewProject({
+      ...newProject,
+      media: [...newProject.media, { url: "", type: "image", is_main: newProject.media.length === 0 }]
+    });
+  };
 
+  const handleMediaChange = (index: number, field: string, value: any) => {
+    const updatedMedia = [...newProject.media];
+    if (field === 'is_main' && value === true) {
+      updatedMedia.forEach((m, i) => m.is_main = i === index);
+    } else {
+      (updatedMedia[index] as any)[field] = value;
+    }
+    setNewProject({ ...newProject, media: updatedMedia });
+  };
+
+  const handleSaveProject = (e: React.FormEvent) => {
+    e.preventDefault();
     fetch('/api/save_data.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...newProject, media: finalMedia, type: 'project', action: 'add' })
+      body: JSON.stringify({ type: 'projects', action: 'add', data: newProject })
     })
     .then(res => res.json())
     .then(data => {
       if (data.success) {
         setIsAddModalOpen(false);
         fetchProjects();
-        setNewProject({ title: "", category: "Commercial", location: "", status: "Ongoing", completion: 0, year: "2024", description: "", image_url: "", media: [] });
+        setNewProject({
+          title: "",
+          category: "Commercial",
+          location: "",
+          status: "Ongoing",
+          completion_percentage: 0,
+          year: "2024",
+          description: "",
+          media: []
+        });
       }
     });
   };
@@ -133,7 +152,7 @@ export default function ProjectsManagement() {
       {/* Projects Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         {filteredProjects.map((project) => (
-          <div key={project.id} className="bg-white border-2 border-admin-black flex flex-col group">
+          <div key={project.id} className="bg-white border-2 border-admin-black flex flex-col group shadow-lg">
             <div className="p-6 flex-1 space-y-6">
               <div className="flex justify-between items-start gap-4">
                 <div>
@@ -160,7 +179,7 @@ export default function ProjectsManagement() {
                 </div>
                 <div className="flex items-center gap-2 text-gray-500">
                   <Building2 size={14} className="text-admin-orange" />
-                  <span className="text-xs font-bold uppercase tracking-widest">{project.year} Est. Build</span>
+                  <span className="text-xs font-bold uppercase tracking-widest">{project.year} Completion</span>
                 </div>
               </div>
 
@@ -207,129 +226,190 @@ export default function ProjectsManagement() {
       {isAddModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-admin-black/80 backdrop-blur-sm" onClick={() => setIsAddModalOpen(false)} />
-          <div className="relative bg-white border-4 border-admin-black w-full max-w-2xl animate-in zoom-in duration-300">
-            <div className="p-8 border-b-2 border-admin-black bg-admin-orange text-white">
-              <h2 className="text-3xl font-admin-header font-black uppercase tracking-tight">Add New Project</h2>
-              <p className="text-xs font-bold uppercase tracking-widest opacity-80 mt-2">Industrial Structural Management</p>
+          <div className="relative bg-white border-4 border-admin-black w-full max-w-4xl max-h-[90vh] overflow-y-auto animate-in zoom-in duration-300 shadow-2xl">
+            <div className="p-8 border-b-2 border-admin-black bg-admin-orange text-white sticky top-0 z-10 flex justify-between items-center">
+              <div>
+                <h2 className="text-3xl font-admin-header font-black uppercase tracking-tight">Configure New Project</h2>
+                <p className="text-xs font-bold uppercase tracking-widest opacity-80 mt-1">Structural Asset Registry</p>
+              </div>
+              <button onClick={() => setIsAddModalOpen(false)} className="p-2 hover:bg-white/20 transition-colors">
+                <X size={24} />
+              </button>
             </div>
-            <form onSubmit={handleAddProject} className="p-8 space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-widest text-gray-500">Project Title</label>
-                  <input 
-                    required
-                    type="text" 
-                    className="w-full bg-admin-surface border-2 border-admin-black p-3 font-bold uppercase tracking-widest text-sm focus:outline-none focus:bg-white transition-colors"
-                    value={newProject.title}
-                    onChange={e => setNewProject({...newProject, title: e.target.value})}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-widest text-gray-500">Category</label>
-                  <select 
-                    className="w-full bg-admin-surface border-2 border-admin-black p-3 font-bold uppercase tracking-widest text-sm focus:outline-none focus:bg-white transition-colors"
-                    value={newProject.category}
-                    onChange={e => setNewProject({...newProject, category: e.target.value})}
-                  >
-                    <option value="Commercial">Commercial</option>
-                    <option value="Residential">Residential</option>
-                    <option value="Infrastructure">Infrastructure</option>
-                  </select>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-widest text-gray-500">Location</label>
-                  <input 
-                    required
-                    type="text" 
-                    className="w-full bg-admin-surface border-2 border-admin-black p-3 font-bold uppercase tracking-widest text-sm focus:outline-none focus:bg-white transition-colors"
-                    value={newProject.location}
-                    onChange={e => setNewProject({...newProject, location: e.target.value})}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-widest text-gray-500">Status</label>
-                  <select 
-                    className="w-full bg-admin-surface border-2 border-admin-black p-3 font-bold uppercase tracking-widest text-sm focus:outline-none focus:bg-white transition-colors"
-                    value={newProject.status}
-                    onChange={e => setNewProject({...newProject, status: e.target.value})}
-                  >
-                    <option value="Ongoing">Ongoing</option>
-                    <option value="Completed">Completed</option>
-                  </select>
-                </div>
-                <div className="md:col-span-2 space-y-4">
-                  <div className="flex justify-between items-center">
-                    <label className="text-xs font-bold uppercase tracking-widest text-gray-500">Project Gallery (Photos & Videos)</label>
-                    <button 
-                      type="button"
-                      onClick={() => setNewProject({...newProject, media: [...newProject.media, { url: "", type: "image", is_main: false }]})}
-                      className="text-[10px] font-bold uppercase tracking-widest text-admin-orange hover:text-admin-black"
-                    >
-                      + Add Media
-                    </button>
-                  </div>
+            
+            <form onSubmit={handleSaveProject} className="p-8 space-y-8">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                {/* Basic Details */}
+                <div className="space-y-6">
+                  <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-admin-orange border-b border-admin-border pb-2">Core Specifications</h4>
                   
-                  <div className="space-y-3">
-                    <div className="flex gap-2">
-                       <input 
-                        placeholder="Main Image URL (This shows on Home Page)"
-                        className="flex-1 bg-admin-surface border-2 border-admin-black p-3 font-bold uppercase tracking-widest text-sm focus:outline-none focus:bg-white transition-colors"
-                        value={newProject.image_url}
-                        onChange={e => setNewProject({...newProject, image_url: e.target.value})}
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Project Title</label>
+                    <input 
+                      required
+                      type="text" 
+                      className="w-full bg-admin-surface border-2 border-admin-black p-4 font-bold uppercase tracking-widest text-sm focus:outline-none focus:bg-white transition-colors"
+                      value={newProject.title}
+                      onChange={e => setNewProject({...newProject, title: e.target.value})}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Category</label>
+                      <select 
+                        className="w-full bg-admin-surface border-2 border-admin-black p-4 font-bold uppercase tracking-widest text-sm focus:outline-none focus:bg-white transition-colors appearance-none"
+                        value={newProject.category}
+                        onChange={e => setNewProject({...newProject, category: e.target.value})}
+                      >
+                        <option>Residential</option>
+                        <option>Commercial</option>
+                        <option>Industrial</option>
+                        <option>Infrastructure</option>
+                      </select>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Status</label>
+                      <select 
+                        className="w-full bg-admin-surface border-2 border-admin-black p-4 font-bold uppercase tracking-widest text-sm focus:outline-none focus:bg-white transition-colors appearance-none"
+                        value={newProject.status}
+                        onChange={e => setNewProject({...newProject, status: e.target.value})}
+                      >
+                        <option>Ongoing</option>
+                        <option>Completed</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Completion Year</label>
+                      <input 
+                        required
+                        type="text" 
+                        className="w-full bg-admin-surface border-2 border-admin-black p-4 font-bold uppercase tracking-widest text-sm focus:outline-none focus:bg-white transition-colors"
+                        value={newProject.year}
+                        onChange={e => setNewProject({...newProject, year: e.target.value})}
                       />
                     </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Progress (%)</label>
+                      <input 
+                        required
+                        type="number" 
+                        min="0"
+                        max="100"
+                        className="w-full bg-admin-surface border-2 border-admin-black p-4 font-bold uppercase tracking-widest text-sm focus:outline-none focus:bg-white transition-colors"
+                        value={newProject.completion_percentage}
+                        onChange={e => setNewProject({...newProject, completion_percentage: parseInt(e.target.value)})}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Location</label>
+                    <input 
+                      required
+                      type="text" 
+                      className="w-full bg-admin-surface border-2 border-admin-black p-4 font-bold uppercase tracking-widest text-sm focus:outline-none focus:bg-white transition-colors"
+                      value={newProject.location}
+                      onChange={e => setNewProject({...newProject, location: e.target.value})}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Project Overview</label>
+                    <textarea 
+                      required
+                      className="w-full bg-admin-surface border-2 border-admin-black p-4 font-bold uppercase tracking-widest text-sm focus:outline-none focus:bg-white transition-colors h-32"
+                      value={newProject.description}
+                      onChange={e => setNewProject({...newProject, description: e.target.value})}
+                    />
+                  </div>
+                </div>
+
+                {/* Media Management */}
+                <div className="space-y-6">
+                  <div className="flex justify-between items-center border-b border-admin-border pb-2">
+                    <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-admin-orange">Multimedia Gallery</h4>
+                    <button 
+                      type="button"
+                      onClick={handleAddMedia}
+                      className="bg-admin-black text-white px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest hover:bg-admin-orange transition-colors"
+                    >
+                      + Add Item
+                    </button>
+                  </div>
+
+                  <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+                    {newProject.media.length === 0 && (
+                      <div className="border-2 border-dashed border-admin-border p-10 text-center">
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">No media added yet</p>
+                      </div>
+                    )}
                     {newProject.media.map((item, idx) => (
-                      <div key={idx} className="flex gap-2">
-                        <input 
-                          placeholder="Media URL"
-                          className="flex-1 bg-admin-surface border-2 border-admin-black p-3 font-bold uppercase tracking-widest text-sm focus:outline-none focus:bg-white transition-colors"
-                          value={item.url}
-                          onChange={e => {
-                            const updated = [...newProject.media];
-                            updated[idx].url = e.target.value;
-                            setNewProject({...newProject, media: updated});
-                          }}
-                        />
-                        <select 
-                          className="bg-admin-surface border-2 border-admin-black p-3 font-bold uppercase tracking-widest text-xs"
-                          value={item.type}
-                          onChange={e => {
-                            const updated = [...newProject.media];
-                            updated[idx].type = e.target.value as 'image' | 'video';
-                            setNewProject({...newProject, media: updated});
-                          }}
-                        >
-                          <option value="image">Image</option>
-                          <option value="video">Video</option>
-                        </select>
-                        <button 
-                          type="button"
-                          onClick={() => {
-                            const updated = newProject.media.filter((_, i) => i !== idx);
-                            setNewProject({...newProject, media: updated});
-                          }}
-                          className="p-3 text-red-500 border-2 border-admin-black"
-                        >
-                          <Trash2 size={16} />
-                        </button>
+                      <div key={idx} className="p-4 bg-admin-surface border-2 border-admin-black space-y-4 relative">
+                        <div className="flex gap-2">
+                          <select 
+                            className="bg-white border-2 border-admin-black p-2 font-bold uppercase tracking-widest text-[10px]"
+                            value={item.type}
+                            onChange={e => handleMediaChange(idx, 'type', e.target.value)}
+                          >
+                            <option value="image">Photo</option>
+                            <option value="video">Video</option>
+                          </select>
+                          <input 
+                            placeholder="URL (Images or MP4)"
+                            className="flex-1 bg-white border-2 border-admin-black p-2 font-bold uppercase tracking-widest text-xs focus:outline-none focus:border-admin-orange"
+                            value={item.url}
+                            onChange={e => handleMediaChange(idx, 'url', e.target.value)}
+                          />
+                          <button 
+                            type="button"
+                            onClick={() => {
+                              const updated = newProject.media.filter((_, i) => i !== idx);
+                              setNewProject({...newProject, media: updated});
+                            }}
+                            className="p-2 text-red-500 hover:bg-red-50"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <label className="flex items-center gap-2 cursor-pointer group">
+                            <input 
+                              type="checkbox" 
+                              checked={item.is_main}
+                              onChange={e => handleMediaChange(idx, 'is_main', e.target.checked)}
+                              className="w-4 h-4 accent-admin-orange border-2 border-admin-black"
+                            />
+                            <div className="flex items-center gap-1.5">
+                              <Star size={12} className={item.is_main ? "text-admin-orange fill-admin-orange" : "text-gray-400"} />
+                              <span className={`text-[10px] font-bold uppercase tracking-widest ${item.is_main ? "text-admin-orange" : "text-gray-400 group-hover:text-admin-black"}`}>
+                                Primary Image (Homepage)
+                              </span>
+                            </div>
+                          </label>
+                        </div>
                       </div>
                     ))}
                   </div>
                 </div>
               </div>
-              <div className="flex gap-4 pt-4">
+
+              <div className="flex gap-4 pt-6 border-t-2 border-admin-black">
                 <button 
                   type="button" 
                   onClick={() => setIsAddModalOpen(false)}
-                  className="flex-1 border-2 border-admin-black py-4 font-bold uppercase tracking-widest text-sm hover:bg-gray-100 transition-colors"
+                  className="flex-1 border-2 border-admin-black py-5 font-bold uppercase tracking-widest text-sm hover:bg-gray-100 transition-colors"
                 >
-                  Cancel
+                  Discard Changes
                 </button>
                 <button 
                   type="submit"
-                  className="flex-1 bg-admin-black text-white py-4 font-bold uppercase tracking-widest text-sm hover:bg-admin-orange transition-colors"
+                  className="flex-1 bg-admin-black text-white py-5 font-bold uppercase tracking-widest text-sm hover:bg-admin-orange transition-colors shadow-xl"
                 >
-                  Save Project
+                  Deploy Project Asset
                 </button>
               </div>
             </form>
