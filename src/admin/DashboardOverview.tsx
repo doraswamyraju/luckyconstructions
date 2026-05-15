@@ -8,21 +8,37 @@ import {
   FileText 
 } from "lucide-react";
 
-const STATS = [
-  { label: "Total Projects", value: "48", trend: "+12%", icon: <Briefcase className="text-admin-orange" /> },
-  { label: "Active Sites", value: "12", trend: "Steady", icon: <Clock className="text-admin-orange" /> },
-  { label: "Pending Reviews", value: "5", trend: "-2", icon: <MessageSquare className="text-admin-orange" /> },
-  { label: "Blog Posts", value: "24", trend: "+3", icon: <FileText className="text-admin-orange" /> },
-];
-
-const RECENT_PROJECTS = [
-  { id: 1, name: "Skyview Commercial Plaza", status: "Ongoing", type: "Commercial", progress: 75 },
-  { id: 2, name: "The Vertex Residences", status: "Completed", type: "Residential", progress: 100 },
-  { id: 3, name: "Tirupati Grand Mall", status: "Ongoing", type: "Commercial", progress: 40 },
-  { id: 4, name: "Highway 9 Overpass", status: "Completed", type: "Infrastructure", progress: 100 },
-];
+// Live data replaces these mock constants
 
 export default function DashboardOverview() {
+  const [projects, setProjects] = React.useState<any[]>([]);
+  const [testimonials, setTestimonials] = React.useState<any[]>([]);
+
+  React.useEffect(() => {
+    fetch('/api/get_data.php?type=projects')
+      .then(res => res.json())
+      .then(data => {
+        if (!data.error) setProjects(data);
+      });
+
+    fetch('/api/get_data.php?type=testimonials')
+      .then(res => res.json())
+      .then(data => {
+        // Here we'd fetch all to see pending, but our simple API only returns approved for now.
+        // We'll expand the API later.
+        if (!data.error) setTestimonials(data);
+      });
+  }, []);
+
+  const stats = [
+    { label: "Total Projects", value: projects.length.toString(), trend: "Live", icon: <Briefcase className="text-admin-orange" /> },
+    { label: "Active Sites", value: projects.filter(p => p.status === 'Ongoing').length.toString(), trend: "Sync", icon: <Clock className="text-admin-orange" /> },
+    { label: "Total Testimonials", value: testimonials.length.toString(), trend: "Live", icon: <MessageSquare className="text-admin-orange" /> },
+    { label: "Recent Projects", value: projects.slice(0, 5).length.toString(), trend: "New", icon: <FileText className="text-admin-orange" /> },
+  ];
+
+  const recentProjects = projects.slice(0, 5);
+
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
@@ -44,7 +60,7 @@ export default function DashboardOverview() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {STATS.map((stat) => (
+        {stats.map((stat) => (
           <div key={stat.label} className="bg-white p-6 border border-admin-border relative overflow-hidden group hover:border-admin-orange transition-colors">
             <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
               {stat.icon}
@@ -78,15 +94,15 @@ export default function DashboardOverview() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-admin-border">
-                {RECENT_PROJECTS.map((project) => (
+                {recentProjects.map((project) => (
                   <tr key={project.id} className="hover:bg-admin-surface transition-colors group">
                     <td className="p-4">
-                      <p className="font-bold text-sm text-admin-black">{project.name}</p>
+                      <p className="font-bold text-sm text-admin-black">{project.title}</p>
                       <p className="text-[10px] text-gray-500 uppercase font-medium">{project.status}</p>
                     </td>
                     <td className="p-4">
                       <span className="text-[10px] font-bold uppercase tracking-widest bg-gray-100 px-2 py-1">
-                        {project.type}
+                        {project.category}
                       </span>
                     </td>
                     <td className="p-4 w-48">
@@ -94,10 +110,10 @@ export default function DashboardOverview() {
                         <div className="flex-1 h-2 bg-gray-100 relative">
                           <div 
                             className="absolute top-0 left-0 h-full bg-admin-orange transition-all duration-1000"
-                            style={{ width: `${project.progress}%` }}
+                            style={{ width: `${project.completion_percentage}%` }}
                           />
                         </div>
-                        <span className="text-[10px] font-bold text-admin-black">{project.progress}%</span>
+                        <span className="text-[10px] font-bold text-admin-black">{project.completion_percentage}%</span>
                       </div>
                     </td>
                     <td className="p-4">

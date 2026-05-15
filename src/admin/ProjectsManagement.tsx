@@ -10,21 +10,56 @@ import {
   Building2 
 } from "lucide-react";
 
-const PROJECTS_DATA = [
-  { id: 1, name: "Skyview Commercial Plaza", type: "Commercial", location: "Tirupati Central", progress: 75, status: "Ongoing" },
-  { id: 2, name: "The Vertex Residences", type: "Residential", location: "Bairagi Patteda", progress: 100, status: "Completed" },
-  { id: 3, name: "Tirupati Grand Mall", type: "Commercial", location: "Renigunta Road", progress: 40, status: "Ongoing" },
-  { id: 4, name: "Highway 9 Overpass", type: "Infrastructure", location: "NH 71", progress: 100, status: "Completed" },
-  { id: 5, name: "Bridgeport Logistics Hub", type: "Industrial", location: "Industrial Estate", progress: 65, status: "Ongoing" },
-  { id: 6, name: "Titanium Residential Complex", type: "Residential", location: "MR Palli", progress: 20, status: "Ongoing" },
-];
+// Live data from API replaces mock constants
 
 export default function ProjectsManagement() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
+  const [projects, setProjects] = useState<any[]>([]);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [newProject, setNewProject] = useState({
+    title: "",
+    category: "Commercial",
+    location: "",
+    status: "Ongoing",
+    completion: 0,
+    year: "2024",
+    description: "",
+    image_url: ""
+  });
 
-  const filteredProjects = PROJECTS_DATA.filter(p => {
-    const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase());
+  const fetchProjects = () => {
+    fetch('/api/get_data.php?type=projects')
+      .then(res => res.json())
+      .then(data => {
+        if (!data.error) setProjects(data);
+      });
+  };
+
+  React.useEffect(() => {
+    fetchProjects();
+  }, []);
+
+  const handleAddProject = (e: React.FormEvent) => {
+    e.preventDefault();
+    fetch('/api/save_data.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...newProject, type: 'project', action: 'add' })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        setIsAddModalOpen(false);
+        fetchProjects();
+        setNewProject({ title: "", category: "Commercial", location: "", status: "Ongoing", completion: 0, year: "2024", description: "", image_url: "" });
+      }
+    });
+  };
+
+  const filteredProjects = projects.filter(p => {
+    const matchesSearch = p.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                          p.location?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === "All" || p.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
@@ -38,7 +73,10 @@ export default function ProjectsManagement() {
             Project Management
           </h1>
         </div>
-        <button className="bg-admin-orange text-white px-8 py-4 font-bold uppercase tracking-widest text-sm hover:bg-admin-black transition-colors flex items-center justify-center gap-2 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+        <button 
+          onClick={() => setIsAddModalOpen(true)}
+          className="bg-admin-orange text-white px-8 py-4 font-bold uppercase tracking-widest text-sm hover:bg-admin-black transition-colors flex items-center justify-center gap-2 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+        >
           <Plus size={18} /> Add New Project
         </button>
       </div>
@@ -80,7 +118,7 @@ export default function ProjectsManagement() {
                 <div>
                   <div className="flex items-center gap-2 mb-2">
                     <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-1 bg-admin-black text-white">
-                      {project.type}
+                      {project.category}
                     </span>
                     <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 border border-admin-black ${
                       project.status === "Completed" ? "bg-green-100 text-green-800" : "bg-admin-orange/10 text-admin-orange"
@@ -89,7 +127,7 @@ export default function ProjectsManagement() {
                     </span>
                   </div>
                   <h3 className="text-xl font-admin-header font-black uppercase tracking-tight text-admin-black leading-tight">
-                    {project.name}
+                    {project.title}
                   </h3>
                 </div>
               </div>
@@ -101,21 +139,21 @@ export default function ProjectsManagement() {
                 </div>
                 <div className="flex items-center gap-2 text-gray-500">
                   <Building2 size={14} className="text-admin-orange" />
-                  <span className="text-xs font-bold uppercase tracking-widest">Structural Build</span>
+                  <span className="text-xs font-bold uppercase tracking-widest">{project.year} Est. Build</span>
                 </div>
               </div>
 
               <div className="space-y-2">
                 <div className="flex justify-between items-end">
                   <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Construction Progress</span>
-                  <span className="text-xs font-bold text-admin-black">{project.progress}%</span>
+                  <span className="text-xs font-bold text-admin-black">{project.completion_percentage}%</span>
                 </div>
                 <div className="h-4 bg-admin-surface border border-admin-border relative overflow-hidden">
                   <div 
                     className={`absolute top-0 left-0 h-full transition-all duration-1000 ${
                       project.status === "Completed" ? "bg-admin-black" : "bg-admin-orange"
                     }`}
-                    style={{ width: `${project.progress}%` }}
+                    style={{ width: `${project.completion_percentage}%` }}
                   >
                     <div className="w-full h-full opacity-20 bg-[linear-gradient(45deg,rgba(255,255,255,0.2)_25%,transparent_25%,transparent_50%,rgba(255,255,255,0.2)_50%,rgba(255,255,255,0.2)_75%,transparent_75%,transparent)] bg-[length:20px_20px]" />
                   </div>
@@ -140,6 +178,99 @@ export default function ProjectsManagement() {
           </div>
         ))}
       </div>
+
+      {/* Add Project Modal */}
+      {isAddModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-admin-black/80 backdrop-blur-sm" onClick={() => setIsAddModalOpen(false)} />
+          <div className="relative bg-white border-4 border-admin-black w-full max-w-2xl animate-in zoom-in duration-300">
+            <div className="p-8 border-b-2 border-admin-black bg-admin-orange text-white">
+              <h2 className="text-3xl font-admin-header font-black uppercase tracking-tight">Add New Project</h2>
+              <p className="text-xs font-bold uppercase tracking-widest opacity-80 mt-2">Industrial Structural Management</p>
+            </div>
+            <form onSubmit={handleAddProject} className="p-8 space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-xs font-bold uppercase tracking-widest text-gray-500">Project Title</label>
+                  <input 
+                    required
+                    type="text" 
+                    className="w-full bg-admin-surface border-2 border-admin-black p-3 font-bold uppercase tracking-widest text-sm focus:outline-none focus:bg-white transition-colors"
+                    value={newProject.title}
+                    onChange={e => setNewProject({...newProject, title: e.target.value})}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-bold uppercase tracking-widest text-gray-500">Category</label>
+                  <select 
+                    className="w-full bg-admin-surface border-2 border-admin-black p-3 font-bold uppercase tracking-widest text-sm focus:outline-none focus:bg-white transition-colors"
+                    value={newProject.category}
+                    onChange={e => setNewProject({...newProject, category: e.target.value})}
+                  >
+                    <option value="Commercial">Commercial</option>
+                    <option value="Residential">Residential</option>
+                    <option value="Infrastructure">Infrastructure</option>
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-bold uppercase tracking-widest text-gray-500">Location</label>
+                  <input 
+                    required
+                    type="text" 
+                    className="w-full bg-admin-surface border-2 border-admin-black p-3 font-bold uppercase tracking-widest text-sm focus:outline-none focus:bg-white transition-colors"
+                    value={newProject.location}
+                    onChange={e => setNewProject({...newProject, location: e.target.value})}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-bold uppercase tracking-widest text-gray-500">Status</label>
+                  <select 
+                    className="w-full bg-admin-surface border-2 border-admin-black p-3 font-bold uppercase tracking-widest text-sm focus:outline-none focus:bg-white transition-colors"
+                    value={newProject.status}
+                    onChange={e => setNewProject({...newProject, status: e.target.value})}
+                  >
+                    <option value="Ongoing">Ongoing</option>
+                    <option value="Completed">Completed</option>
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-bold uppercase tracking-widest text-gray-500">Progress (%)</label>
+                  <input 
+                    type="number" 
+                    className="w-full bg-admin-surface border-2 border-admin-black p-3 font-bold uppercase tracking-widest text-sm focus:outline-none focus:bg-white transition-colors"
+                    value={newProject.completion}
+                    onChange={e => setNewProject({...newProject, completion: parseInt(e.target.value)})}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-bold uppercase tracking-widest text-gray-500">Completion Year</label>
+                  <input 
+                    type="text" 
+                    className="w-full bg-admin-surface border-2 border-admin-black p-3 font-bold uppercase tracking-widest text-sm focus:outline-none focus:bg-white transition-colors"
+                    value={newProject.year}
+                    onChange={e => setNewProject({...newProject, year: e.target.value})}
+                  />
+                </div>
+              </div>
+              <div className="flex gap-4 pt-4">
+                <button 
+                  type="button" 
+                  onClick={() => setIsAddModalOpen(false)}
+                  className="flex-1 border-2 border-admin-black py-4 font-bold uppercase tracking-widest text-sm hover:bg-gray-100 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit"
+                  className="flex-1 bg-admin-black text-white py-4 font-bold uppercase tracking-widest text-sm hover:bg-admin-orange transition-colors"
+                >
+                  Save Project
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

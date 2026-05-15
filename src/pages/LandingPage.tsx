@@ -41,59 +41,40 @@ const HERO_SLIDES = [
   "https://images.unsplash.com/photo-1590483736622-398544071bda?auto=format&fit=crop&q=80"
 ];
 
-const COMPLETED_PROJECTS = [
-  {
-    image: "https://images.unsplash.com/photo-1541888088320-b30fef6a3479?auto=format&fit=crop&q=80",
-    name: "Skyview Commercial Plaza",
-    category: "Commercial",
-    year: "2023"
-  },
-  {
-    image: "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&q=80",
-    name: "The Vertex Residences",
-    category: "Residential",
-    year: "2022"
-  },
-  {
-    image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80",
-    name: "Corporate Headquarters",
-    category: "Commercial",
-    year: "2021"
-  },
-];
-
-const IN_PROGRESS_PROJECTS = [
-  {
-    image: "https://images.unsplash.com/photo-1531834685032-c34bf0d84c77?auto=format&fit=crop&q=80",
-    name: "Tirupati Grand Mall",
-    category: "Commercial",
-    status: "80% Complete"
-  },
-  {
-    image: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&q=80",
-    name: "Highway 9 Overpass",
-    category: "Infrastructure",
-    status: "65% Complete"
-  },
-  {
-    image: "https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?auto=format&fit=crop&q=80",
-    name: "Emerald Housing Block",
-    category: "Residential",
-    status: "40% Complete"
-  },
-];
-
-const TESTIMONIALS = [
-  { name: "Rahul Verma", role: "Commercial Developer", quote: "Lucky Constructions exceeded our timelines without compromising quality. An absolute benchmark in structural engineering." },
-  { name: "Sneha Reddy", role: "Resident, Tirupati", quote: "The renovation they handled for our family estate was seamless. Their attention to safety and material quality is phenomenal." },
-  { name: "Kiran Kumar", role: "City Planner", quote: "I've worked with many contractors across Andhra Pradesh, but their commitment to architectural integrity makes them stand out." }
-];
+// Data is now fetched from the API
 
 export default function LandingPage() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [projectTab, setProjectTab] = useState<'completed' | 'progress'>('completed');
+  const [dbProjects, setDbProjects] = useState<any[]>([]);
+  const [dbTestimonials, setDbTestimonials] = useState<any[]>([]);
+
+  useEffect(() => {
+    // Fetch Projects
+    fetch('/api/get_data.php?type=projects')
+      .then(res => res.json())
+      .then(data => {
+        if (!data.error) setDbProjects(data);
+      })
+      .catch(err => console.error("Error fetching projects:", err));
+
+    // Fetch Testimonials
+    fetch('/api/get_data.php?type=testimonials')
+      .then(res => res.json())
+      .then(data => {
+        if (!data.error) setDbTestimonials(data);
+      })
+      .catch(err => console.error("Error fetching testimonials:", err));
+  }, []);
+
+  const completedProjects = dbProjects.filter(p => p.status === 'Completed');
+  const inProgressProjects = dbProjects.filter(p => p.status === 'Ongoing');
+  const activeTestimonials = dbTestimonials.length > 0 ? dbTestimonials : [
+    { name: "Rahul Verma", role: "Commercial Developer", quote: "Lucky Constructions exceeded our timelines without compromising quality. An absolute benchmark in structural engineering." },
+    { name: "Sneha Reddy", role: "Resident, Tirupati", quote: "The renovation they handled for our family estate was seamless. Their attention to safety and material quality is phenomenal." }
+  ];
 
   const { scrollY } = useScroll();
   const yHero = useTransform(scrollY, [0, 1000], [0, 400]);
@@ -115,7 +96,6 @@ export default function LandingPage() {
     return () => clearInterval(timer);
   }, []);
 
-  const activeProjects = projectTab === 'completed' ? COMPLETED_PROJECTS : IN_PROGRESS_PROJECTS;
 
   return (
     <div className="font-sans text-brand-black bg-brand-white selection:bg-brand-gold selection:text-white">
@@ -519,54 +499,64 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {/* Dynamic Grid Layout */}
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mt-16">
-            <AnimatePresence mode="wait">
-              {activeProjects.map((project, index) => {
-                // Different sizing for masonry feel
-                let colSpan = "md:col-span-4";
-                if (index === 0) colSpan = "md:col-span-8";
-                else if (index === 1) colSpan = "md:col-span-4";
-                else if (index === 2) colSpan = "md:col-span-12 lg:col-span-6";
-
-                return (
+          <div className="mt-16">
+            {projectTab === 'completed' ? (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {completedProjects.map((project, index) => (
                   <motion.div
-                    key={project.name + projectTab}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
+                    key={index}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
                     transition={{ duration: 0.5, delay: index * 0.1 }}
-                    className={`group relative overflow-hidden bg-gray-900 cursor-pointer min-h-[300px] md:min-h-[400px] ${colSpan}`}
+                    className="group relative h-[450px] overflow-hidden"
                   >
-                    <img
-                      src={project.image}
-                      alt={project.name}
-                      className="w-full h-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-105 transition-all duration-1000 ease-out mix-blend-luminosity grayscale group-hover:grayscale-0"
+                    <img 
+                      src={project.image_url || "https://images.unsplash.com/photo-1541888088320-b30fef6a3479?auto=format&fit=crop&q=80"} 
+                      alt={project.title} 
+                      className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-700"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-90" />
-                    <div className="absolute bottom-0 left-0 p-8 w-full flex justify-between items-end">
-                      <div className="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                        <div className="flex items-center gap-3 mb-2">
-                           <p className="text-brand-gold font-bold uppercase tracking-widest text-xs">
-                             {project.category}
-                           </p>
-                           <div className="w-1 h-1 bg-white/50 rounded-full" />
-                           <p className="text-white/70 text-xs font-bold uppercase tracking-widest">
-                             {project.year || project.status}
-                           </p>
-                        </div>
-                        <h3 className="text-2xl md:text-3xl font-display font-bold uppercase tracking-tight text-white line-clamp-2 pr-4">
-                          {project.name}
-                        </h3>
-                      </div>
-                      <div className="w-12 h-12 bg-brand-gold flex items-center justify-center opacity-0 group-hover:opacity-100 transform translate-x-4 group-hover:translate-x-0 transition-all duration-500">
-                         <ArrowRight className="w-6 h-6 text-brand-black" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-brand-black via-transparent to-transparent opacity-80 group-hover:opacity-90 transition-opacity" />
+                    <div className="absolute bottom-0 left-0 p-8 w-full">
+                      <div className="text-brand-gold font-bold uppercase text-xs tracking-widest mb-2">{project.category}</div>
+                      <h4 className="text-white font-display font-bold text-2xl uppercase tracking-tight mb-4">{project.title}</h4>
+                      <div className="flex justify-between items-center text-gray-400 text-xs font-bold uppercase tracking-widest pt-4 border-t border-white/10">
+                        <span>Completion Year</span>
+                        <span className="text-white">{project.year || "2023"}</span>
                       </div>
                     </div>
                   </motion.div>
-                );
-              })}
-            </AnimatePresence>
+                ))}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {inProgressProjects.map((project, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                    className="group relative h-[450px] overflow-hidden"
+                  >
+                    <img 
+                      src={project.image_url || "https://images.unsplash.com/photo-1531834685032-c34bf0d84c77?auto=format&fit=crop&q=80"} 
+                      alt={project.title} 
+                      className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-700"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-brand-black via-transparent to-transparent opacity-80 group-hover:opacity-90 transition-opacity" />
+                    <div className="absolute bottom-0 left-0 p-8 w-full">
+                      <div className="text-brand-gold font-bold uppercase text-xs tracking-widest mb-2">{project.category}</div>
+                      <h4 className="text-white font-display font-bold text-2xl uppercase tracking-tight mb-4">{project.title}</h4>
+                      <div className="flex justify-between items-center text-gray-400 text-xs font-bold uppercase tracking-widest pt-4 border-t border-white/10">
+                        <span>Current Status</span>
+                        <span className="text-brand-gold">{project.completion_percentage}% Complete</span>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            )}
           </div>
           
           <div className="mt-16 text-center">
@@ -592,22 +582,19 @@ export default function LandingPage() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {TESTIMONIALS.map((testimonial, i) => (
+            {activeTestimonials.map((testimonial, index) => (
               <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 30 }}
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
-                className="bg-white p-10 shadow-sm border border-gray-100 relative group hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="bg-white p-10 md:p-12 relative shadow-sm border border-gray-100"
               >
-                <div className="absolute top-0 right-0 p-10 opacity-5 group-hover:opacity-10 transition-opacity">
-                   <Star className="w-24 h-24 stroke-1 fill-current text-brand-gold" />
+                <div className="absolute top-0 right-0 w-16 h-16 bg-brand-gold/5 flex items-center justify-center">
+                  <Star className="text-brand-gold w-6 h-6" fill="currentColor" />
                 </div>
-                <div className="flex gap-1 text-brand-gold mb-8 content-relative z-10">
-                  {[...Array(5)].map((_, idx) => <Star key={idx} className="w-4 h-4 fill-current" />)}
-                </div>
-                <p className="text-gray-600 font-medium italic mb-8 relative z-10 leading-relaxed min-h-[100px]">
+                <p className="text-xl md:text-2xl text-brand-black font-medium leading-relaxed mb-8 italic">
                   "{testimonial.quote}"
                 </p>
                 <div className="relative z-10">
