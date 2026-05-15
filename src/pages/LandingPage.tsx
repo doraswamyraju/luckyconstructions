@@ -127,7 +127,7 @@ export default function LandingPage() {
       >
         <div className="container mx-auto px-6 md:px-12 flex justify-between items-center">
           <a href="#" className="flex items-center gap-3 group">
-            <img src="/logo.jpg" alt="Lucky Constructions Logo" className="h-[50px] w-auto object-contain rounded-sm" />
+            <img src="/logo.jpeg" alt="Lucky Constructions Logo" className="h-[50px] w-auto object-contain rounded-sm" />
             <span className={`font-display font-bold text-2xl tracking-tight hidden sm:block ${isScrolled ? "text-brand-black" : "text-white"}`}>
               LUCKY <span className="text-brand-gold">CONSTRUCTIONS</span>
             </span>
@@ -671,7 +671,7 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-24 mb-20 relative">
             <div className="col-span-1">
               <div className="flex items-center gap-2 group mb-6">
-                <img src="/logo.jpg" alt="Lucky Constructions Logo" className="h-12 w-auto object-contain bg-white p-1 rounded-sm" />
+                <img src="/logo.jpeg" alt="Lucky Constructions Logo" className="h-12 w-auto object-contain bg-white p-1 rounded-sm" />
                 <span className="font-display font-bold text-2xl tracking-tight text-white">
                   LUCKY <span className="text-brand-gold">CONSTRUCTIONS</span>
                 </span>

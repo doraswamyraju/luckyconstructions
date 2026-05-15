@@ -39,8 +39,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         } bg-admin-black text-white transition-all duration-300 flex flex-col z-50`}
       >
         <div className="p-6 flex items-center gap-3 border-b border-white/10 overflow-hidden whitespace-nowrap">
-          <div className="w-8 h-8 bg-admin-orange shrink-0 flex items-center justify-center font-admin-header font-bold text-white">
-            L
+          <div className="w-8 h-8 shrink-0 flex items-center justify-center">
+            <img src="/logo.jpeg" alt="L" className="w-full h-full object-contain" />
           </div>
           <span className={`font-admin-header font-bold text-xl tracking-tight transition-opacity ${isSidebarOpen ? "opacity-100" : "opacity-0"}`}>
             LUCKY <span className="text-admin-orange">ADMIN</span>
