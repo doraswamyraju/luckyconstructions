@@ -47,7 +47,7 @@ export default function App() {
           <ProtectedRoute>
             <AdminLayout>
               <BlogManagement />
-            </ProtectedRoute>
+            </AdminLayout>
           </ProtectedRoute>
         } />
         <Route path="/admin/profile" element={
