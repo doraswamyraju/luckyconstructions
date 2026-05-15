@@ -348,9 +348,9 @@ export default function LandingPage() {
             >
               <div className="absolute inset-0 bg-brand-gold translate-x-4 translate-y-4 -z-10" />
               <img 
-                src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80" 
+                src="/founder.png" 
                 alt="Founder of Lucky Constructions" 
-                className="w-full h-auto object-cover grayscale hover:grayscale-0 transition-all duration-700"
+                className="w-full h-auto object-cover transition-all duration-700 shadow-2xl"
               />
             </motion.div>
             <motion.div
