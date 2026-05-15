@@ -27,6 +27,7 @@ export default function ProjectsManagement() {
     description: "",
     media: [] as { url: string; type: 'image' | 'video'; is_main: boolean; inputMode?: 'upload' | 'url' }[]
   });
+  const [editingProjectId, setEditingProjectId] = useState<number | null>(null);
 
   const fetchProjects = () => {
     fetch('/api/get_data.php?type=projects')
@@ -59,10 +60,15 @@ export default function ProjectsManagement() {
 
   const handleSaveProject = (e: React.FormEvent) => {
     e.preventDefault();
+    const action = editingProjectId ? 'update' : 'add';
     fetch('/api/save_data.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: 'projects', action: 'add', data: newProject })
+      body: JSON.stringify({ 
+        type: 'projects', 
+        action: action, 
+        data: { ...newProject, id: editingProjectId } 
+      })
     })
     .then(res => res.json())
     .then(data => {
@@ -114,7 +120,20 @@ export default function ProjectsManagement() {
           </h1>
         </div>
         <button 
-          onClick={() => setIsAddModalOpen(true)}
+          onClick={() => {
+            setNewProject({
+              title: "",
+              category: "Commercial",
+              location: "",
+              status: "Ongoing",
+              completion_percentage: 0,
+              year: "2024",
+              description: "",
+              media: []
+            });
+            setEditingProjectId(null);
+            setIsAddModalOpen(true);
+          }}
           className="bg-admin-orange text-white px-8 py-4 font-bold uppercase tracking-widest text-sm hover:bg-admin-black transition-colors flex items-center justify-center gap-2 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
         >
           <Plus size={18} /> Add New Project
@@ -206,7 +225,23 @@ export default function ProjectsManagement() {
                 <Eye size={16} className="group-hover/btn:text-admin-orange" />
                 <span className="text-[10px] font-bold uppercase tracking-widest">View</span>
               </button>
-              <button className="p-4 hover:bg-admin-surface transition-colors flex items-center justify-center gap-2 group/btn">
+              <button 
+                onClick={() => {
+                  setNewProject({
+                    title: project.title,
+                    category: project.category,
+                    location: project.location,
+                    status: project.status,
+                    completion_percentage: project.completion_percentage,
+                    year: project.year,
+                    description: project.description,
+                    media: project.media || []
+                  });
+                  setEditingProjectId(project.id);
+                  setIsAddModalOpen(true);
+                }}
+                className="p-4 hover:bg-admin-surface transition-colors flex items-center justify-center gap-2 group/btn"
+              >
                 <Edit2 size={16} className="group-hover/btn:text-admin-orange" />
                 <span className="text-[10px] font-bold uppercase tracking-widest">Edit</span>
               </button>
