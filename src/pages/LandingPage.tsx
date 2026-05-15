@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence, useScroll, useTransform } from "motion/react";
-import { Menu, X, ArrowRight, Hammer, HardHat, Compass, Ruler, Building2, Phone, Mail, MapPin, Star, ChevronRight, ShieldCheck, Clock, Users, Lock } from "lucide-react";
+import { Menu, X, ArrowRight, Hammer, HardHat, Compass, Ruler, Building2, Phone, Mail, MapPin, Star, ChevronRight, ShieldCheck, Clock, Users, Lock, MessageCircle, ArrowUp } from "lucide-react";
 
 const NAV_LINKS = [
   { name: "Home", href: "#home" },
@@ -712,9 +712,12 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-bold text-gray-500 uppercase tracking-widest">
-            <p>&copy; {new Date().getFullYear()} Lucky Constructions. All rights reserved.</p>
-            <div className="flex gap-4">
+          <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-6 text-xs font-bold text-gray-500 uppercase tracking-widest text-center md:text-left">
+            <div>
+              <p>&copy; {new Date().getFullYear()} Lucky Constructions. All rights reserved.</p>
+              <p className="mt-2 normal-case font-medium">Built with <span className="text-red-500">❤️</span> by <a href="https://www.rajugariventures.com" target="_blank" rel="noopener noreferrer" className="text-brand-gold hover:underline">Rajugari Ventures</a></p>
+            </div>
+            <div className="flex gap-6">
               <a href="#" className="hover:text-brand-gold transition-colors">Instagram</a>
               <a href="#" className="hover:text-brand-gold transition-colors">LinkedIn</a>
               <a href="#" className="hover:text-brand-gold transition-colors">Facebook</a>
@@ -722,6 +725,51 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
+
+      {/* Floating Action Buttons */}
+      <div className="fixed bottom-8 right-8 z-[100] flex flex-col gap-4">
+        {/* Scroll to Top */}
+        <AnimatePresence>
+          {isScrolled && (
+            <motion.button
+              initial={{ opacity: 0, scale: 0.5, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.5, y: 20 }}
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              className="bg-white text-brand-black p-4 rounded-full shadow-2xl hover:bg-brand-gold hover:text-white transition-all group border border-gray-100"
+              title="Back to Top"
+            >
+              <ArrowUp size={24} className="group-hover:-translate-y-1 transition-transform" />
+            </motion.button>
+          )}
+        </AnimatePresence>
+
+        {/* WhatsApp Button */}
+        <a
+          href="https://wa.me/917893872131"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="bg-[#25D366] text-white p-4 rounded-full shadow-2xl hover:scale-110 transition-transform flex items-center justify-center relative group"
+          title="Chat on WhatsApp"
+        >
+          <MessageCircle size={28} fill="currentColor" />
+          <span className="absolute right-full mr-4 bg-white text-brand-black px-4 py-2 rounded-lg text-sm font-bold shadow-xl opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none border border-gray-100">
+            Chat with us
+          </span>
+        </a>
+
+        {/* Call Button */}
+        <a
+          href="tel:+917893872131"
+          className="bg-brand-gold text-white p-4 rounded-full shadow-2xl hover:scale-110 transition-transform flex items-center justify-center relative group"
+          title="Call us Now"
+        >
+          <Phone size={28} fill="currentColor" />
+          <span className="absolute right-full mr-4 bg-white text-brand-black px-4 py-2 rounded-lg text-sm font-bold shadow-xl opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none border border-gray-100">
+            Call us: +91 7893872131
+          </span>
+        </a>
+      </div>
     </div>
   );
 }
