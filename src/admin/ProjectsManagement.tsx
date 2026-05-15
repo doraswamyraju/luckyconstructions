@@ -349,7 +349,7 @@ export default function ProjectsManagement() {
                     )}
                     {newProject.media.map((item, idx) => (
                       <div key={idx} className="p-4 bg-admin-surface border-2 border-admin-black space-y-4 relative">
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 items-center">
                           <select 
                             className="bg-white border-2 border-admin-black p-2 font-bold uppercase tracking-widest text-[10px]"
                             value={item.type}
@@ -358,12 +358,37 @@ export default function ProjectsManagement() {
                             <option value="image">Photo</option>
                             <option value="video">Video</option>
                           </select>
-                          <input 
-                            placeholder="URL (Images or MP4)"
-                            className="flex-1 bg-white border-2 border-admin-black p-2 font-bold uppercase tracking-widest text-xs focus:outline-none focus:border-admin-orange"
-                            value={item.url}
-                            onChange={e => handleMediaChange(idx, 'url', e.target.value)}
-                          />
+                          
+                          <div className="flex-1 flex gap-2">
+                            {item.url ? (
+                              <div className="flex-1 flex items-center gap-2 bg-white border-2 border-admin-black p-2 text-[10px] font-bold text-green-600 truncate">
+                                <span>READY: {item.url}</span>
+                              </div>
+                            ) : (
+                              <input 
+                                type="file"
+                                accept={item.type === 'image' ? "image/*" : "video/*"}
+                                className="flex-1 bg-white border-2 border-admin-black p-2 font-bold uppercase tracking-widest text-[10px] file:hidden cursor-pointer"
+                                onChange={async (e) => {
+                                  const file = e.target.files?.[0];
+                                  if (!file) return;
+                                  
+                                  const formData = new FormData();
+                                  formData.append('file', file);
+                                  
+                                  const res = await fetch('/api/upload.php', {
+                                    method: 'POST',
+                                    body: formData
+                                  });
+                                  const data = await res.json();
+                                  if (data.success) {
+                                    handleMediaChange(idx, 'url', data.url);
+                                  }
+                                }}
+                              />
+                            )}
+                          </div>
+
                           <button 
                             type="button"
                             onClick={() => {
