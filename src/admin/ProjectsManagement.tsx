@@ -76,10 +76,6 @@ export default function ProjectsManagement() {
       if (data.success) {
         setIsAddModalOpen(false);
         fetchProjects();
-          year: "2024",
-          description: "",
-          media: []
-        });
       }
     });
   };
