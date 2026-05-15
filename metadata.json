@@ -1,0 +1,6 @@
+{
+  "name": "Lucky Constructions",
+  "description": "A modern React frontend website for Lucky Constructions using a white, black, and orange color palette.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
