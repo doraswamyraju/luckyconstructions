@@ -143,7 +143,7 @@ export default function LandingPage() {
               title="Admin Dashboard"
             >
               <Lock size={16} />
-            </Link>
+            </button>
             <a
               href="#contact"
               className="bg-brand-gold text-white px-6 py-2.5 font-bold uppercase tracking-widest text-xs hover:bg-brand-black transition-colors rounded-sm"
