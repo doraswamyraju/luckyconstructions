@@ -237,7 +237,7 @@ export default function LandingPage() {
                 className="flex items-center gap-4 mb-6"
               >
                 <div className="h-1 w-12 bg-brand-gold" />
-                <span className="text-brand-gold font-bold uppercase tracking-[0.2em] text-sm">Est. 1998</span>
+                <span className="text-brand-gold font-bold uppercase tracking-[0.2em] text-sm">Est. 2019</span>
               </motion.div>
 
               <motion.h1
