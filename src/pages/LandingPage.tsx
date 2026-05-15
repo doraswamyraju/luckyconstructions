@@ -367,7 +367,7 @@ export default function LandingPage() {
                 Vision Driven By Experience
               </h2>
               <p className="text-gray-600 leading-relaxed mb-6">
-                Founded in 1998, Lucky Constructions started with a simple belief: construction is not just about assembling materials, it's about crafting legacies. For over two decades, our leadership has guided the company through complex engineering challenges, economic shifts, and technological advancements.
+                Founded in 2019, Lucky Constructions started with a simple belief: construction is not just about assembling materials, it's about crafting legacies. Our leadership has guided the company through complex engineering challenges and defining urban landscapes.
               </p>
               <p className="text-gray-600 leading-relaxed mb-8">
                 Our success is rooted in our people. From the draftsmen to the site managers, we foster a culture of precision, safety, and unwavering commitment to client vision.
