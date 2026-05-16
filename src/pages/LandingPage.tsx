@@ -1,6 +1,11 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { motion, AnimatePresence, useScroll, useTransform } from "motion/react";
-import { Hammer, HardHat, Compass, Ruler, Building2, MapPin, Phone, Mail, ChevronRight, MessageCircle, ArrowUp, Star, Lock } from "lucide-react";
+import { 
+  Hammer, HardHat, Compass, Ruler, Building2, MapPin, Phone, Mail, 
+  ChevronRight, MessageCircle, ArrowUp, Star, Lock, ArrowRight,
+  ShieldCheck, Clock, Users 
+} from "lucide-react";
 import ProjectDetailModal from "../components/ProjectDetailModal";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -42,6 +47,13 @@ export default function LandingPage() {
   const [dbProjects, setDbProjects] = useState<any[]>([]);
   const [dbTestimonials, setDbTestimonials] = useState<any[]>([]);
   const [selectedProject, setSelectedProject] = useState<any | null>(null);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setIsScrolled(window.scrollY > 100);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   useEffect(() => {
     // Fetch Projects
@@ -591,66 +603,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Contact / Footer */}
-      <footer id="contact" className="bg-brand-black pt-24 pb-12 border-t border-white/10 text-white">
-        <div className="container mx-auto px-6 md:px-12">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-24 mb-20 relative">
-            <div className="col-span-1">
-              <div className="flex items-center gap-2 group mb-6">
-                <img src="/logo.jpeg" alt="Lucky Constructions Logo" className="h-12 w-auto object-contain bg-white p-1 rounded-sm" />
-                <span className="font-display font-bold text-2xl tracking-tight text-white">
-                  LUCKY <span className="text-brand-gold">CONSTRUCTIONS</span>
-                </span>
-              </div>
-              <p className="text-gray-400 text-sm leading-relaxed mb-6 max-w-xs">
-                Shaping skylines and building futures since 1998. Your trusted civil engineering partner in Tirupati.
-              </p>
-            </div>
-
-            <div className="col-span-1">
-              <h4 className="font-display font-bold text-lg uppercase tracking-tight mb-6 text-white">Contact Info</h4>
-              <ul className="space-y-6 text-gray-400 text-sm">
-                <li className="flex items-start gap-4 hover:text-brand-gold transition-colors">
-                  <div className="mt-1"><MapPin className="w-5 h-5 text-brand-gold shrink-0" /></div>
-                  <span className="leading-relaxed">Shop.No.38a, 1st Floor, Tuda Complex,<br />Bairagi patteda, Tirupati,<br />Andhra Pradesh 517502</span>
-                </li>
-                <li className="flex items-center gap-4 hover:text-brand-gold transition-colors">
-                  <div className="mt-0.5"><Phone className="w-5 h-5 text-brand-gold shrink-0" /></div>
-                  <span>+91 7893872131</span>
-                </li>
-                <li className="flex items-center gap-4 hover:text-brand-gold transition-colors">
-                  <div className="mt-0.5"><Mail className="w-5 h-5 text-brand-gold shrink-0" /></div>
-                  <span>hello@luckyconstructions.in</span>
-                </li>
-              </ul>
-            </div>
-
-            <div className="col-span-1">
-              <h4 className="font-display font-bold text-lg uppercase tracking-tight mb-6 text-white">Quick Links</h4>
-              <ul className="space-y-3 font-semibold text-gray-400 text-sm uppercase tracking-wide">
-                <li><a href="#founder" className="hover:text-brand-gold transition-colors flex items-center gap-2"><ChevronRight className="w-4 h-4"/> Founder</a></li>
-                <li><a href="#services" className="hover:text-brand-gold transition-colors flex items-center gap-2"><ChevronRight className="w-4 h-4"/> Our Services</a></li>
-                <li><a href="#projects" className="hover:text-brand-gold transition-colors flex items-center gap-2"><ChevronRight className="w-4 h-4"/> Portfolio</a></li>
-                <li><a href="#testimonials" className="hover:text-brand-gold transition-colors flex items-center gap-2"><ChevronRight className="w-4 h-4"/> Testimonials</a></li>
-                <li><Link to="/admin" className="hover:text-brand-gold transition-colors flex items-center gap-2 text-admin-orange font-bold"><Lock className="w-4 h-4"/> Admin Portal</Link></li>
-                <li><a href="#" className="hover:text-brand-gold transition-colors flex items-center gap-2"><ChevronRight className="w-4 h-4"/> Privacy Policy</a></li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-6 text-xs font-bold text-gray-500 uppercase tracking-widest text-center md:text-left">
-            <div>
-              <p>&copy; {new Date().getFullYear()} Lucky Constructions. All rights reserved.</p>
-              <p className="mt-2 normal-case font-medium">Built with <span className="text-red-500">❤️</span> by <a href="https://www.rajugariventures.com" target="_blank" rel="noopener noreferrer" className="text-brand-gold hover:underline">Rajugari Ventures</a></p>
-            </div>
-            <div className="flex gap-6">
-              <a href="#" className="hover:text-brand-gold transition-colors">Instagram</a>
-              <a href="#" className="hover:text-brand-gold transition-colors">LinkedIn</a>
-              <a href="#" className="hover:text-brand-gold transition-colors">Facebook</a>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
 
       {/* Floating Action Buttons */}
       <div className="fixed bottom-8 right-8 z-[100] flex flex-col gap-4">
