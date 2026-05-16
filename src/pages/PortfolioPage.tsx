@@ -1,23 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { 
-  MapPin, 
-  Calendar, 
-  Clock, 
-  X, 
-  ChevronRight, 
-  Menu, 
-  ArrowRight, 
-  Phone, 
-  Mail, 
-  Instagram, 
-  Facebook, 
-  Linkedin, 
-  Building2,
-  Lock
-} from "lucide-react";
-import { Link } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import ProjectDetailModal from "../components/ProjectDetailModal";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
 
 export default function PortfolioPage() {
   const [projects, setProjects] = useState<any[]>([]);
@@ -40,41 +25,7 @@ export default function PortfolioPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* HEADER (Exact copy from LandingPage) */}
-      <nav className="fixed w-full z-[100] transition-all duration-500 bg-white/95 backdrop-blur-md shadow-sm py-4">
-        <div className="container mx-auto px-6 flex justify-between items-center">
-          <Link to="/" className="flex items-center gap-3">
-             <div className="w-10 h-10 bg-brand-black flex items-center justify-center">
-                <Building2 className="text-brand-gold w-6 h-6" />
-             </div>
-             <div>
-                <span className="text-xl font-display font-black text-brand-black tracking-tighter leading-none block">LUCKY</span>
-                <span className="text-[10px] font-bold text-brand-gold tracking-[0.3em] uppercase block -mt-1">Constructions</span>
-             </div>
-          </Link>
-
-          <div className="hidden lg:flex items-center gap-8 bg-gray-100/50 px-8 py-3 rounded-full border border-gray-200">
-            <Link to="/" className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400 hover:text-brand-black transition-colors">Home</Link>
-            <a href="/#services" className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400 hover:text-brand-black transition-colors">Services</a>
-            <Link to="/portfolio" className="text-[10px] font-black uppercase tracking-[0.3em] text-brand-black border-b-2 border-brand-gold pb-1">Portfolio</Link>
-            <a href="/#testimonials" className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400 hover:text-brand-black transition-colors">Testimonials</a>
-            <a href="/#contact" className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400 hover:text-brand-black transition-colors">Contact</a>
-          </div>
-
-          <div className="hidden lg:flex items-center gap-4">
-            <button onClick={() => window.location.href = '/admin'} className="p-2 rounded-full border border-gray-200 text-gray-400 hover:text-brand-gold transition-all">
-              <Lock size={16} />
-            </button>
-            <a href="#contact" className="bg-brand-gold text-white px-6 py-2.5 font-bold uppercase tracking-widest text-xs hover:bg-brand-black transition-colors rounded-sm shadow-lg shadow-brand-gold/20">
-              Get a Quote
-            </a>
-          </div>
-
-          <button className="lg:hidden text-brand-black" onClick={() => setIsMenuOpen(true)}>
-            <Menu size={30} />
-          </button>
-        </div>
-      </nav>
+      <Header variant="dark" />
 
       {/* PORTFOLIO CONTENT */}
       <section className="pt-40 pb-20 bg-brand-black relative">
@@ -133,83 +84,7 @@ export default function PortfolioPage() {
       </section>
 
       {/* FOOTER (Exact copy from LandingPage) */}
-      <footer className="bg-brand-black text-white pt-24 pb-12">
-        <div className="container mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-20">
-            <div className="col-span-1 lg:col-span-1">
-              <div className="flex items-center gap-3 mb-8">
-                <div className="w-10 h-10 bg-brand-gold flex items-center justify-center">
-                  <Building2 className="text-brand-black w-6 h-6" />
-                </div>
-                <h3 className="text-2xl font-display font-black tracking-tighter">LUCKY <span className="text-brand-gold">CONST</span></h3>
-              </div>
-              <p className="text-gray-400 text-sm leading-relaxed mb-8">
-                Shaping skylines and building futures since 1998. Your trusted civil engineering partner in Tirupati.
-              </p>
-              <div className="flex gap-4">
-                <a href="#" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-brand-gold transition-colors group">
-                  <Instagram size={18} className="group-hover:text-brand-black" />
-                </a>
-                <a href="#" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-brand-gold transition-colors group">
-                  <Facebook size={18} className="group-hover:text-brand-black" />
-                </a>
-                <a href="#" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-brand-gold transition-colors group">
-                  <Linkedin size={18} className="group-hover:text-brand-black" />
-                </a>
-              </div>
-            </div>
-
-            <div>
-              <h4 className="text-sm font-bold uppercase tracking-widest mb-8 border-b border-brand-gold/30 pb-2 inline-block">Contact Info</h4>
-              <ul className="space-y-6">
-                <li className="flex gap-4">
-                  <MapPin className="text-brand-gold shrink-0" size={20} />
-                  <span className="text-gray-400 text-sm leading-relaxed">Shop.No.38a, 1st Floor, Tuda Complex,<br />Bairagi patteda, Tirupati,<br />Andhra Pradesh 517502</span>
-                </li>
-                <li className="flex gap-4">
-                  <Phone className="text-brand-gold shrink-0" size={20} />
-                  <span className="text-gray-400 text-sm">+91 7893872131</span>
-                </li>
-                <li className="flex gap-4">
-                  <Mail className="text-brand-gold shrink-0" size={20} />
-                  <span className="text-gray-400 text-sm">hello@luckyconstructions.in</span>
-                </li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="text-sm font-bold uppercase tracking-widest mb-8 border-b border-brand-gold/30 pb-2 inline-block">Quick Links</h4>
-              <ul className="space-y-4">
-                {['Founder', 'Our Services', 'Portfolio', 'Testimonials', 'Admin Portal', 'Privacy Policy'].map((link) => (
-                  <li key={link}>
-                    <a href="#" className="text-gray-400 hover:text-brand-gold transition-colors text-sm flex items-center gap-2">
-                      <ChevronRight size={14} /> {link}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="bg-brand-gold/5 p-8 border border-brand-gold/20">
-              <h4 className="text-sm font-bold uppercase tracking-widest mb-4">Build Your Dream</h4>
-              <p className="text-xs text-gray-400 leading-relaxed mb-6">Ready to start your next construction project with the experts?</p>
-              <a href="#contact" className="block text-center bg-brand-gold text-white py-4 font-bold uppercase tracking-widest text-[10px] hover:bg-white hover:text-brand-black transition-all">Start Now</a>
-            </div>
-          </div>
-
-          <div className="pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
-            <p className="text-gray-500 text-[10px] font-bold uppercase tracking-widest text-center md:text-left">
-              © 2026 LUCKY CONSTRUCTIONS. ALL RIGHTS RESERVED.<br />
-              <span className="text-gray-600">Built with ❤️ by <span className="text-brand-gold">Rajugari Ventures</span></span>
-            </p>
-            <div className="flex gap-8 text-[10px] font-bold uppercase tracking-widest text-gray-500">
-              <a href="#" className="hover:text-white transition-colors">Instagram</a>
-              <a href="#" className="hover:text-white transition-colors">Linkedin</a>
-              <a href="#" className="hover:text-white transition-colors">Facebook</a>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
 
       {/* Detail Modal */}
       <AnimatePresence>
