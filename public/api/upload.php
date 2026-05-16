@@ -9,7 +9,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['file'])) {
         mkdir($uploadDir, 0777, true);
     }
     
-    $fileName = time() . '_' . basename($file['name']);
+    // Sanitize filename: remove spaces and special characters
+    $cleanName = preg_replace("/[^a-zA-Z0-9\._-]/", "_", $file['name']);
+    $fileName = time() . '_' . $cleanName;
     $targetPath = $uploadDir . $fileName;
     
     if (move_uploaded_file($file['tmp_name'], $targetPath)) {
