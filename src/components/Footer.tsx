@@ -4,7 +4,7 @@ export default function Footer() {
   return (
     <footer id="contact" className="bg-brand-black pt-24 pb-12 border-t border-white/10 text-white">
       <div className="container mx-auto px-6 md:px-12">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-24 mb-20 relative">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-20 relative">
           <div className="col-span-1">
             <div className="flex items-center gap-2 group mb-6">
               <img src="/logo.jpeg" alt="Lucky Constructions Logo" className="h-12 w-auto object-contain bg-white p-1 rounded-sm" />
@@ -28,7 +28,7 @@ export default function Footer() {
             </div>
           </div>
 
-          <div className="col-span-1">
+          <div>
             <h4 className="font-display font-bold text-lg uppercase tracking-tight mb-6 text-white border-b border-brand-gold/30 pb-2 inline-block">Contact Info</h4>
             <ul className="space-y-6 text-gray-400 text-sm">
               <li className="flex items-start gap-4 hover:text-brand-gold transition-colors">
@@ -51,12 +51,18 @@ export default function Footer() {
             <ul className="space-y-4">
               {['Founder', 'Our Services', 'Portfolio', 'Testimonials', 'Admin Portal', 'Privacy Policy'].map((link) => (
                 <li key={link}>
-                  <a href={link === 'Portfolio' ? '/portfolio' : '/#' + link.toLowerCase().replace(' ', '')} className="text-gray-400 hover:text-brand-gold transition-colors text-sm flex items-center gap-2">
+                  <a href={link === 'Portfolio' ? '/portfolio' : (link === 'Admin Portal' ? '/admin' : '/#' + link.toLowerCase().replace(' ', ''))} className="text-gray-400 hover:text-brand-gold transition-colors text-sm flex items-center gap-2">
                     <ChevronRight size={14} /> {link}
                   </a>
                 </li>
               ))}
             </ul>
+          </div>
+
+          <div className="bg-brand-gold/5 p-8 border border-brand-gold/20">
+            <h4 className="text-sm font-bold uppercase tracking-widest mb-4">Build Your Dream</h4>
+            <p className="text-xs text-gray-400 leading-relaxed mb-6">Ready to start your next construction project with the experts?</p>
+            <a href="/#contact" className="block text-center bg-brand-gold text-white py-4 font-bold uppercase tracking-widest text-[10px] hover:bg-white hover:text-brand-black transition-all">Start Now</a>
           </div>
         </div>
 

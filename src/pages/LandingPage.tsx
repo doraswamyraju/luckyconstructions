@@ -225,22 +225,30 @@ export default function LandingPage() {
       {/* Stats Section */}
       <section className="py-12 bg-brand-gold z-20 relative">
         <div className="container mx-auto px-6 md:px-12">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 lg:grid-cols-6 gap-8">
             <div className="text-center text-brand-black">
-              <div className="font-display font-bold text-5xl mb-2">25+</div>
-              <div className="text-sm font-bold uppercase tracking-widest text-brand-black/70">Years Exp</div>
+              <div className="font-display font-bold text-3xl mb-2">6+</div>
+              <div className="text-[10px] font-bold uppercase tracking-widest text-brand-black/70">Years Exp</div>
             </div>
             <div className="text-center text-brand-black">
-              <div className="font-display font-bold text-5xl mb-2">150+</div>
-              <div className="text-sm font-bold uppercase tracking-widest text-brand-black/70">Projects</div>
+              <div className="font-display font-bold text-3xl mb-2">15+</div>
+              <div className="text-[10px] font-bold uppercase tracking-widest text-brand-black/70">Projects</div>
             </div>
             <div className="text-center text-brand-black">
-              <div className="font-display font-bold text-5xl mb-2">50+</div>
-              <div className="text-sm font-bold uppercase tracking-widest text-brand-black/70">Engineers</div>
+              <div className="font-display font-bold text-3xl mb-2">30+</div>
+              <div className="text-[10px] font-bold uppercase tracking-widest text-brand-black/70">Masons</div>
             </div>
             <div className="text-center text-brand-black">
-              <div className="font-display font-bold text-5xl mb-2">100%</div>
-              <div className="text-sm font-bold uppercase tracking-widest text-brand-black/70">Safety</div>
+              <div className="font-display font-bold text-3xl mb-2">30+</div>
+              <div className="text-[10px] font-bold uppercase tracking-widest text-brand-black/70">Unskilled</div>
+            </div>
+            <div className="text-center text-brand-black">
+              <div className="font-display font-bold text-3xl mb-2">20+</div>
+              <div className="text-[10px] font-bold uppercase tracking-widest text-brand-black/70">Skilled</div>
+            </div>
+            <div className="text-center text-brand-black">
+              <div className="font-display font-bold text-3xl mb-2">20000+</div>
+              <div className="text-[10px] font-bold uppercase tracking-widest text-brand-black/70">Shuttering Sft</div>
             </div>
           </div>
         </div>
