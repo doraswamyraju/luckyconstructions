@@ -8,7 +8,6 @@ export default function PortfolioPage() {
   const [projects, setProjects] = useState<any[]>([]);
   const [filter, setFilter] = useState<'All' | 'Completed' | 'Ongoing'>('All');
   const [selectedProject, setSelectedProject] = useState<any | null>(null);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     fetch('/api/get_data.php?type=projects')
