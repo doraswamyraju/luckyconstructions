@@ -469,7 +469,7 @@ export default function LandingPage() {
                     onClick={() => setSelectedProject(project)}
                   >
                     <img 
-                      src={project.image_url || "https://images.unsplash.com/photo-1541888088320-b30fef6a3479?auto=format&fit=crop&q=80"} 
+                      src={project.media?.find((m: any) => m.is_main)?.url || project.media?.[0]?.url || project.image_url || "https://images.unsplash.com/photo-1541888088320-b30fef6a3479?auto=format&fit=crop&q=80"} 
                       alt={project.title} 
                       className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-700"
                     />
@@ -498,7 +498,7 @@ export default function LandingPage() {
                     onClick={() => setSelectedProject(project)}
                   >
                     <img 
-                      src={project.image_url || "https://images.unsplash.com/photo-1531834685032-c34bf0d84c77?auto=format&fit=crop&q=80"} 
+                      src={project.media?.find((m: any) => m.is_main)?.url || project.media?.[0]?.url || project.image_url || "https://images.unsplash.com/photo-1531834685032-c34bf0d84c77?auto=format&fit=crop&q=80"} 
                       alt={project.title} 
                       className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-700"
                     />

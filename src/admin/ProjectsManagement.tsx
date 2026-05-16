@@ -241,7 +241,7 @@ export default function ProjectsManagement() {
 
             <div className="aspect-video bg-gray-100 overflow-hidden relative border-b-2 border-admin-black">
               <img 
-                src={project.image_url} 
+                src={project.media?.find((m: any) => m.is_main)?.url || project.media?.[0]?.url || project.image_url || '/api/placeholder/400/300'} 
                 alt={project.title}
                 className="w-full h-full object-cover"
               />
