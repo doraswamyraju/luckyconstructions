@@ -51,6 +51,7 @@ export default function LandingPage() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [leadForm, setLeadForm] = useState({ name: "", email: "", phone: "", service: "SERVICES", message: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [testimonialIndex, setTestimonialIndex] = useState(0);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 100);
@@ -129,6 +130,15 @@ export default function LandingPage() {
     }, 5000);
     return () => clearInterval(timer);
   }, []);
+
+  // Testimonials Auto-Play
+  useEffect(() => {
+    if (activeTestimonials.length <= 3) return;
+    const timer = setInterval(() => {
+      setTestimonialIndex((prev) => (prev + 1) % activeTestimonials.length);
+    }, 6000);
+    return () => clearInterval(timer);
+  }, [activeTestimonials.length]);
 
   return (
     <div className="font-sans text-brand-black bg-brand-white selection:bg-brand-gold selection:text-white">
@@ -553,28 +563,51 @@ export default function LandingPage() {
             </h2>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {activeTestimonials.map((testimonial, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="bg-white p-10 md:p-12 relative shadow-sm border border-gray-100"
-              >
-                <div className="absolute top-0 right-0 w-16 h-16 bg-brand-gold/5 flex items-center justify-center">
-                  <Star className="text-brand-gold w-6 h-6" fill="currentColor" />
+          <div className="relative overflow-hidden">
+            <div className="flex gap-8 transition-all duration-700 ease-in-out" style={{ transform: `translateX(-${(testimonialIndex % Math.max(1, activeTestimonials.length)) * (100 / 3)}%)`, width: `${Math.max(100, (activeTestimonials.length / 3) * 100)}%` }}>
+              {activeTestimonials.map((testimonial, index) => (
+                <div
+                  key={index}
+                  className="w-1/3 flex-shrink-0"
+                >
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: (index % 3) * 0.1 }}
+                    className="bg-white p-8 h-full relative shadow-lg border border-gray-100 group hover:border-brand-gold/30 transition-all flex flex-col justify-between"
+                  >
+                    <div>
+                      <div className="absolute top-0 right-0 w-12 h-12 bg-brand-gold/5 flex items-center justify-center">
+                        <Star className="text-brand-gold w-4 h-4" fill="currentColor" />
+                      </div>
+                      <div className="mb-6">
+                        <MessageCircle className="text-brand-gold/20 w-10 h-10 mb-4" />
+                        <p className="text-base text-gray-700 leading-relaxed italic line-clamp-6">
+                          "{testimonial.text}"
+                        </p>
+                      </div>
+                    </div>
+                    <div className="pt-6 border-t border-gray-50">
+                      <h4 className="font-display text-base font-bold text-brand-black uppercase tracking-tight mb-1">{testimonial.name}</h4>
+                      <p className="text-brand-gold text-[10px] font-bold uppercase tracking-widest">{testimonial.role}</p>
+                    </div>
+                  </motion.div>
                 </div>
-                <p className="text-xl md:text-2xl text-brand-black font-medium leading-relaxed mb-8 italic">
-                  "{testimonial.text}"
-                </p>
-                <div className="relative z-10">
-                  <h4 className="font-display text-lg font-bold text-brand-black uppercase tracking-tight mb-1">{testimonial.name}</h4>
-                  <p className="text-brand-gold text-xs font-bold uppercase tracking-widest">{testimonial.role}</p>
-                </div>
-              </motion.div>
-            ))}
+              ))}
+            </div>
+
+            {/* Pagination Dots */}
+            <div className="flex justify-center gap-2 mt-12">
+              {activeTestimonials.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setTestimonialIndex(i)}
+                  className={`h-1.5 transition-all duration-300 ${testimonialIndex === i ? 'w-8 bg-brand-gold' : 'w-2 bg-gray-300 hover:bg-brand-gold/50'}`}
+                  aria-label={`Go to testimonial ${i + 1}`}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </section>
