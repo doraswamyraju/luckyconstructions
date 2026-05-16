@@ -22,6 +22,7 @@ const MENU_ITEMS = [
   { name: "Dashboard", path: "/admin", icon: <LayoutDashboard size={20} /> },
   { name: "Projects", path: "/admin/projects", icon: <Briefcase size={20} /> },
   { name: "Testimonials", path: "/admin/testimonials", icon: <MessageSquare size={20} /> },
+  { name: "Leads", path: "/admin/leads", icon: <Bell size={20} /> },
   { name: "Blog", path: "/admin/blog", icon: <FileText size={20} /> },
   { name: "Profile", path: "/admin/profile", icon: <User size={20} /> },
 ];

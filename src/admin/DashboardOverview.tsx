@@ -5,7 +5,8 @@ import {
   Clock, 
   Briefcase, 
   MessageSquare, 
-  FileText 
+  FileText,
+  Bell
 } from "lucide-react";
 
 // Live data replaces these mock constants
@@ -13,6 +14,7 @@ import {
 export default function DashboardOverview() {
   const [projects, setProjects] = React.useState<any[]>([]);
   const [testimonials, setTestimonials] = React.useState<any[]>([]);
+  const [leads, setLeads] = React.useState<any[]>([]);
 
   React.useEffect(() => {
     fetch('/api/get_data.php?type=projects')
@@ -24,9 +26,13 @@ export default function DashboardOverview() {
     fetch('/api/get_data.php?type=testimonials')
       .then(res => res.json())
       .then(data => {
-        // Here we'd fetch all to see pending, but our simple API only returns approved for now.
-        // We'll expand the API later.
         if (!data.error) setTestimonials(data);
+      });
+
+    fetch('/api/get_data.php?type=leads')
+      .then(res => res.json())
+      .then(data => {
+        if (!data.error) setLeads(data);
       });
   }, []);
 
@@ -34,7 +40,7 @@ export default function DashboardOverview() {
     { label: "Total Projects", value: projects.length.toString(), trend: "Live", icon: <Briefcase className="text-admin-orange" /> },
     { label: "Active Sites", value: projects.filter(p => p.status === 'Ongoing').length.toString(), trend: "Sync", icon: <Clock className="text-admin-orange" /> },
     { label: "Total Testimonials", value: testimonials.length.toString(), trend: "Live", icon: <MessageSquare className="text-admin-orange" /> },
-    { label: "Recent Projects", value: projects.slice(0, 5).length.toString(), trend: "New", icon: <FileText className="text-admin-orange" /> },
+    { label: "Pending Leads", value: leads.filter(l => l.status === 'New').length.toString(), trend: "New", icon: <Bell className="text-admin-orange" /> },
   ];
 
   const recentProjects = projects.slice(0, 5);

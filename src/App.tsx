@@ -5,8 +5,11 @@ import DashboardOverview from "./admin/DashboardOverview";
 import ProjectsManagement from "./admin/ProjectsManagement";
 import TestimonialsManagement from "./admin/TestimonialsManagement";
 import BlogManagement from "./admin/BlogManagement";
+import LeadsManagement from "./admin/LeadsManagement";
 import AdminProfile from "./admin/AdminProfile";
 import PortfolioPage from "./pages/PortfolioPage";
+import BlogListPage from "./pages/BlogListPage";
+import BlogPostDetailPage from "./pages/BlogPostDetailPage";
 import LoginPage from "./admin/LoginPage";
 
 // Simple Protected Route Component
@@ -22,6 +25,8 @@ export default function App() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/portfolio" element={<PortfolioPage />} />
+        <Route path="/blog" element={<BlogListPage />} />
+        <Route path="/blog/:id" element={<BlogPostDetailPage />} />
         <Route path="/admin/login" element={<LoginPage />} />
         
         <Route path="/admin" element={
@@ -42,6 +47,13 @@ export default function App() {
           <ProtectedRoute>
             <AdminLayout>
               <TestimonialsManagement />
+            </AdminLayout>
+          </ProtectedRoute>
+        } />
+        <Route path="/admin/leads" element={
+          <ProtectedRoute>
+            <AdminLayout>
+              <LeadsManagement />
             </AdminLayout>
           </ProtectedRoute>
         } />

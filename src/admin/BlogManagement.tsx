@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { 
   Plus, 
   Search, 
@@ -8,43 +8,73 @@ import {
   Trash2, 
   Calendar, 
   User, 
-  Tag 
+  Tag,
+  X
 } from "lucide-react";
-
-const BLOG_POSTS = [
-  {
-    id: 1,
-    title: "Modernizing Concrete Logistics for Urban High-Rises",
-    author: "Admin",
-    date: "Oct 15, 2024",
-    category: "Industry",
-    status: "Published",
-    image: "https://images.unsplash.com/photo-1541913080-21400ee8b244?auto=format&fit=crop&q=80&w=400"
-  },
-  {
-    id: 2,
-    title: "Safety Protocols 2024: Zero-Accident Site Management",
-    author: "Site Lead",
-    date: "Oct 10, 2024",
-    category: "Safety",
-    status: "Draft",
-    image: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&q=80&w=400"
-  },
-  {
-    id: 3,
-    title: "Sustainable Building Materials: The Future of Infrastructure",
-    author: "Admin",
-    date: "Sep 25, 2024",
-    category: "Company News",
-    status: "Published",
-    image: "https://images.unsplash.com/photo-1590644365607-1c5a519a7a37?auto=format&fit=crop&q=80&w=400"
-  }
-];
 
 export default function BlogManagement() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [blogs, setBlogs] = useState<any[]>([]);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [newBlog, setNewBlog] = useState({
+    title: "",
+    author: "Admin",
+    category: "Industry",
+    status: "Published",
+    image: "",
+    content: "",
+    date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+  });
+  const [editingId, setEditingId] = useState<number | null>(null);
 
-  const filteredPosts = BLOG_POSTS.filter(p => 
+  const fetchBlogs = () => {
+    fetch('/api/get_data.php?type=blogs')
+      .then(res => res.json())
+      .then(data => {
+        if (!data.error) setBlogs(data);
+      });
+  };
+
+  useEffect(() => {
+    fetchBlogs();
+  }, []);
+
+  const handleSave = (e: React.FormEvent) => {
+    e.preventDefault();
+    const action = editingId ? 'update' : 'add';
+    fetch('/api/save_data.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        type: 'blogs', 
+        action: action, 
+        data: { ...newBlog, id: editingId } 
+      })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        setIsAddModalOpen(false);
+        fetchBlogs();
+      }
+    });
+  };
+
+  const handleDelete = (id: number) => {
+    if (window.confirm("Delete this post?")) {
+      fetch('/api/save_data.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, type: 'blogs', action: 'delete' })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) fetchBlogs();
+      });
+    }
+  };
+
+  const filteredPosts = blogs.filter(p => 
     p.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -57,7 +87,22 @@ export default function BlogManagement() {
             Blog Management
           </h1>
         </div>
-        <button className="bg-admin-orange text-white px-8 py-4 font-bold uppercase tracking-widest text-sm hover:bg-admin-black transition-colors flex items-center justify-center gap-2 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+        <button 
+          onClick={() => {
+            setNewBlog({
+              title: "",
+              author: "Admin",
+              category: "Industry",
+              status: "Published",
+              image: "",
+              content: "",
+              date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+            });
+            setEditingId(null);
+            setIsAddModalOpen(true);
+          }}
+          className="bg-admin-orange text-white px-8 py-4 font-bold uppercase tracking-widest text-sm hover:bg-admin-black transition-colors flex items-center justify-center gap-2 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+        >
           <Plus size={18} /> Create New Post
         </button>
       </div>
@@ -74,15 +119,6 @@ export default function BlogManagement() {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <div className="relative min-w-[160px]">
-          <Filter className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-          <select className="w-full bg-admin-surface border border-admin-border pl-12 pr-4 py-3 text-sm font-bold uppercase tracking-widest focus:outline-none focus:border-admin-orange transition-colors appearance-none">
-            <option>All Categories</option>
-            <option>Industry</option>
-            <option>Safety</option>
-            <option>Company News</option>
-          </select>
-        </div>
       </div>
 
       {/* Blog Posts List */}
@@ -91,7 +127,7 @@ export default function BlogManagement() {
           <div key={post.id} className="bg-white border border-admin-border flex flex-col md:flex-row overflow-hidden group hover:border-admin-black transition-colors">
             <div className="w-full md:w-64 h-48 md:h-auto overflow-hidden grayscale group-hover:grayscale-0 transition-all duration-500">
               <img 
-                src={post.image} 
+                src={post.image || "https://images.unsplash.com/photo-1541913080-21400ee8b244?auto=format&fit=crop&q=80&w=400"} 
                 alt={post.title} 
                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
               />
@@ -123,13 +159,28 @@ export default function BlogManagement() {
               </div>
 
               <div className="flex gap-4 mt-8 pt-6 border-t border-admin-border">
-                <button className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest hover:text-admin-orange transition-colors">
+                <button 
+                  onClick={() => {
+                    setNewBlog({
+                      title: post.title,
+                      author: post.author,
+                      category: post.category,
+                      status: post.status,
+                      image: post.image,
+                      content: post.content,
+                      date: post.date
+                    });
+                    setEditingId(post.id);
+                    setIsAddModalOpen(true);
+                  }}
+                  className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest hover:text-admin-orange transition-colors"
+                >
                   <Edit2 size={14} /> Edit
                 </button>
-                <button className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest hover:text-admin-orange transition-colors">
-                  <Eye size={14} /> Preview
-                </button>
-                <button className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-red-500 hover:text-red-600 transition-colors">
+                <button 
+                  onClick={() => handleDelete(post.id)}
+                  className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-red-500 hover:text-red-600 transition-colors"
+                >
                   <Trash2 size={14} /> Delete
                 </button>
               </div>
@@ -137,6 +188,47 @@ export default function BlogManagement() {
           </div>
         ))}
       </div>
+
+      {/* Add/Edit Modal */}
+      {isAddModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-admin-black/80 backdrop-blur-sm" onClick={() => setIsAddModalOpen(false)} />
+          <div className="relative bg-white border-4 border-admin-black w-full max-w-4xl max-h-[90vh] overflow-y-auto animate-in zoom-in duration-300">
+            <div className="p-6 border-b-2 border-admin-black bg-admin-orange text-white flex justify-between items-center sticky top-0 z-10">
+              <h2 className="text-2xl font-admin-header font-black uppercase tracking-tight">{editingId ? 'Edit' : 'Create'} Post</h2>
+              <button onClick={() => setIsAddModalOpen(false)}><X size={24} /></button>
+            </div>
+            <form onSubmit={handleSave} className="p-8 space-y-6">
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Article Title</label>
+                <input required className="w-full bg-admin-surface border-2 border-admin-black p-4 font-bold text-lg" value={newBlog.title} onChange={e => setNewBlog({...newBlog, title: e.target.value})} />
+              </div>
+              <div className="grid grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Category</label>
+                  <select className="w-full bg-admin-surface border-2 border-admin-black p-4 font-bold" value={newBlog.category} onChange={e => setNewBlog({...newBlog, category: e.target.value})}>
+                    <option>Industry</option>
+                    <option>Safety</option>
+                    <option>Company News</option>
+                    <option>Design</option>
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Featured Image URL</label>
+                  <input className="w-full bg-admin-surface border-2 border-admin-black p-4 font-bold" value={newBlog.image} onChange={e => setNewBlog({...newBlog, image: e.target.value})} placeholder="https://..." />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Content (Markdown supported)</label>
+                <textarea required className="w-full bg-admin-surface border-2 border-admin-black p-4 font-bold h-64" value={newBlog.content} onChange={e => setNewBlog({...newBlog, content: e.target.value})} />
+              </div>
+              <button type="submit" className="w-full bg-admin-black text-white py-5 font-bold uppercase tracking-widest hover:bg-admin-orange transition-colors shadow-xl">
+                Deploy Article
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { 
   Plus, 
   Search, 
@@ -8,51 +8,76 @@ import {
   EyeOff, 
   Edit2, 
   Trash2,
-  Quote
+  Quote,
+  X
 } from "lucide-react";
-
-const TESTIMONIALS_DATA = [
-  { 
-    id: 1, 
-    name: "Robert Miller", 
-    role: "Project Manager", 
-    project: "Bridgeport Logistics Hub", 
-    text: "The structural integrity and attention to detail on the Logistics Hub were exceptional. Lucky Constructions delivered ahead of schedule.",
-    rating: 5,
-    date: "Oct 12, 2024",
-    status: "Approved",
-    visible: true
-  },
-  { 
-    id: 2, 
-    name: "Anita Rao", 
-    role: "Homeowner", 
-    project: "The Vertex Residences", 
-    text: "Professional, reliable, and transparent throughout the building process. Highly recommended for premium residential projects.",
-    rating: 5,
-    date: "Sep 28, 2024",
-    status: "Pending",
-    visible: false
-  },
-  { 
-    id: 3, 
-    name: "Suresh Kumar", 
-    role: "MD, Grand Mall Group", 
-    project: "Tirupati Grand Mall", 
-    text: "Complex engineering tasks were handled with precision. A true partner in large-scale commercial development.",
-    rating: 4,
-    date: "Aug 15, 2024",
-    status: "Approved",
-    visible: true
-  },
-];
 
 export default function TestimonialsManagement() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [testimonials, setTestimonials] = useState<any[]>([]);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [newTestimonial, setNewTestimonial] = useState({
+    name: "",
+    role: "",
+    project: "",
+    text: "",
+    rating: 5,
+    status: "Approved",
+    visible: true,
+    date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+  });
+  const [editingId, setEditingId] = useState<number | null>(null);
 
-  const filteredTestimonials = TESTIMONIALS_DATA.filter(t => 
+  const fetchTestimonials = () => {
+    fetch('/api/get_data.php?type=testimonials')
+      .then(res => res.json())
+      .then(data => {
+        if (!data.error) setTestimonials(data);
+      });
+  };
+
+  useEffect(() => {
+    fetchTestimonials();
+  }, []);
+
+  const handleSave = (e: React.FormEvent) => {
+    e.preventDefault();
+    const action = editingId ? 'update' : 'add';
+    fetch('/api/save_data.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        type: 'testimonials', 
+        action: action, 
+        data: { ...newTestimonial, id: editingId } 
+      })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        setIsAddModalOpen(false);
+        fetchTestimonials();
+      }
+    });
+  };
+
+  const handleDelete = (id: number) => {
+    if (window.confirm("Delete this testimonial?")) {
+      fetch('/api/save_data.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, type: 'testimonials', action: 'delete' })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) fetchTestimonials();
+      });
+    }
+  };
+
+  const filteredTestimonials = testimonials.filter(t => 
     t.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    t.project.toLowerCase().includes(searchTerm.toLowerCase())
+    t.project?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -64,7 +89,23 @@ export default function TestimonialsManagement() {
             Testimonials
           </h1>
         </div>
-        <button className="bg-admin-orange text-white px-8 py-4 font-bold uppercase tracking-widest text-sm hover:bg-admin-black transition-colors flex items-center justify-center gap-2 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+        <button 
+          onClick={() => {
+            setNewTestimonial({
+              name: "",
+              role: "",
+              project: "",
+              text: "",
+              rating: 5,
+              status: "Approved",
+              visible: true,
+              date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+            });
+            setEditingId(null);
+            setIsAddModalOpen(true);
+          }}
+          className="bg-admin-orange text-white px-8 py-4 font-bold uppercase tracking-widest text-sm hover:bg-admin-black transition-colors flex items-center justify-center gap-2 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+        >
           <Plus size={18} /> Add New Review
         </button>
       </div>
@@ -138,10 +179,29 @@ export default function TestimonialsManagement() {
                 </div>
 
                 <div className="flex gap-2">
-                  <button className="px-4 py-2 border border-admin-black text-[10px] font-bold uppercase tracking-widest hover:bg-admin-black hover:text-white transition-all flex items-center gap-2">
+                  <button 
+                    onClick={() => {
+                      setNewTestimonial({
+                        name: t.name,
+                        role: t.role,
+                        project: t.project,
+                        text: t.text,
+                        rating: t.rating,
+                        status: t.status,
+                        visible: t.visible,
+                        date: t.date
+                      });
+                      setEditingId(t.id);
+                      setIsAddModalOpen(true);
+                    }}
+                    className="px-4 py-2 border border-admin-black text-[10px] font-bold uppercase tracking-widest hover:bg-admin-black hover:text-white transition-all flex items-center gap-2"
+                  >
                     <Edit2 size={12} /> Edit
                   </button>
-                  <button className="px-4 py-2 bg-red-50 text-red-500 border border-red-200 text-[10px] font-bold uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all flex items-center gap-2">
+                  <button 
+                    onClick={() => handleDelete(t.id)}
+                    className="px-4 py-2 bg-red-50 text-red-500 border border-red-200 text-[10px] font-bold uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all flex items-center gap-2"
+                  >
                     <Trash2 size={12} /> Delete
                   </button>
                 </div>
@@ -150,6 +210,55 @@ export default function TestimonialsManagement() {
           </div>
         ))}
       </div>
+
+      {/* Add/Edit Modal */}
+      {isAddModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-admin-black/80 backdrop-blur-sm" onClick={() => setIsAddModalOpen(false)} />
+          <div className="relative bg-white border-4 border-admin-black w-full max-w-2xl animate-in zoom-in duration-300">
+            <div className="p-6 border-b-2 border-admin-black bg-admin-orange text-white flex justify-between items-center">
+              <h2 className="text-2xl font-admin-header font-black uppercase tracking-tight">{editingId ? 'Edit' : 'Add'} Testimonial</h2>
+              <button onClick={() => setIsAddModalOpen(false)}><X size={24} /></button>
+            </div>
+            <form onSubmit={handleSave} className="p-8 space-y-6">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Client Name</label>
+                  <input required className="w-full bg-admin-surface border-2 border-admin-black p-3 text-sm font-bold" value={newTestimonial.name} onChange={e => setNewTestimonial({...newTestimonial, name: e.target.value})} />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Role/Company</label>
+                  <input className="w-full bg-admin-surface border-2 border-admin-black p-3 text-sm font-bold" value={newTestimonial.role} onChange={e => setNewTestimonial({...newTestimonial, role: e.target.value})} />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Project Name</label>
+                <input className="w-full bg-admin-surface border-2 border-admin-black p-3 text-sm font-bold" value={newTestimonial.project} onChange={e => setNewTestimonial({...newTestimonial, project: e.target.value})} />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Review Text</label>
+                <textarea required className="w-full bg-admin-surface border-2 border-admin-black p-3 text-sm font-bold h-32" value={newTestimonial.text} onChange={e => setNewTestimonial({...newTestimonial, text: e.target.value})} />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Rating (1-5)</label>
+                  <input type="number" min="1" max="5" className="w-full bg-admin-surface border-2 border-admin-black p-3 text-sm font-bold" value={newTestimonial.rating} onChange={e => setNewTestimonial({...newTestimonial, rating: parseInt(e.target.value)})} />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Status</label>
+                  <select className="w-full bg-admin-surface border-2 border-admin-black p-3 text-sm font-bold" value={newTestimonial.status} onChange={e => setNewTestimonial({...newTestimonial, status: e.target.value})}>
+                    <option>Approved</option>
+                    <option>Pending</option>
+                  </select>
+                </div>
+              </div>
+              <button type="submit" className="w-full bg-admin-black text-white py-4 font-bold uppercase tracking-widest hover:bg-admin-orange transition-colors">
+                Save Review
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
