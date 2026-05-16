@@ -35,7 +35,6 @@ const HERO_SLIDES = [
 
 export default function LandingPage() {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [currentSlide, setCurrentSlide] = useState(0);
   const [projectTab, setProjectTab] = useState<'completed' | 'progress'>('completed');
   const [dbProjects, setDbProjects] = useState<any[]>([]);
   const [dbTestimonials, setDbTestimonials] = useState<any[]>([]);
