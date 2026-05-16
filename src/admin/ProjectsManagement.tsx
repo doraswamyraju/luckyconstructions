@@ -125,7 +125,7 @@ export default function ProjectsManagement() {
       fetch('/api/save_data.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id, type: 'project', action: 'delete' })
+        body: JSON.stringify({ id, type: 'projects', action: 'delete' })
       })
       .then(res => res.json())
       .then(data => {

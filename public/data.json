@@ -1,0 +1,34 @@
+{
+  "projects": [],
+  "testimonials": [
+    {
+      "id": 1,
+      "name": "Rahul Verma",
+      "role": "Commercial Developer",
+      "project": "Industrial Warehouse",
+      "text": "Lucky Constructions exceeded our timelines without compromising quality. An absolute benchmark in structural engineering.",
+      "rating": 5,
+      "status": "Approved",
+      "visible": true,
+      "date": "May 10, 2026"
+    },
+    {
+      "id": 2,
+      "name": "Sneha Reddy",
+      "role": "Resident, Tirupati",
+      "project": "G+2 Villa",
+      "text": "The renovation they handled for our family estate was seamless. Their attention to safety and material quality is phenomenal.",
+      "rating": 5,
+      "status": "Approved",
+      "visible": true,
+      "date": "May 12, 2026"
+    }
+  ],
+  "leads": [],
+  "blogs": [],
+  "admin": {
+    "username": "admin",
+    "password": "admin123",
+    "email": "admin@luckyconstructions.com"
+  }
+}

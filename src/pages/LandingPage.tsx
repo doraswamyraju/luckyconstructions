@@ -102,7 +102,7 @@ export default function LandingPage() {
     fetch('/api/save_data.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: 'leads', action: 'add', data: leadForm })
+      body: JSON.stringify({ type: 'leads', action: 'add', data: { ...leadForm, status: 'New', submitted_at: new Date().toISOString() } })
     })
     .then(res => res.json())
     .then(data => {
@@ -116,10 +116,7 @@ export default function LandingPage() {
 
   const completedProjects = dbProjects.filter(p => p.status === 'Completed');
   const inProgressProjects = dbProjects.filter(p => p.status === 'Ongoing');
-  const activeTestimonials = dbTestimonials.length > 0 ? dbTestimonials : [
-    { name: "Rahul Verma", role: "Commercial Developer", text: "Lucky Constructions exceeded our timelines without compromising quality. An absolute benchmark in structural engineering." },
-    { name: "Sneha Reddy", role: "Resident, Tirupati", text: "The renovation they handled for our family estate was seamless. Their attention to safety and material quality is phenomenal." }
-  ];
+  const activeTestimonials = dbTestimonials;
 
   const { scrollY } = useScroll();
   const yHero = useTransform(scrollY, [0, 1000], [0, 400]);
