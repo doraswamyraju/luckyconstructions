@@ -416,13 +416,55 @@ export default function ProjectsManagement() {
                 <div className="space-y-6">
                   <div className="flex justify-between items-center border-b border-admin-border pb-2">
                     <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-admin-orange">Multimedia Gallery</h4>
-                    <button 
-                      type="button"
-                      onClick={handleAddMedia}
-                      className="bg-admin-black text-white px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest hover:bg-admin-orange transition-colors"
-                    >
-                      + Add Item
-                    </button>
+                    <div className="flex gap-2">
+                      <button 
+                        type="button"
+                        onClick={() => {
+                          const input = document.createElement('input');
+                          input.type = 'file';
+                          input.multiple = true;
+                          input.accept = 'image/*';
+                          input.onchange = async (e: any) => {
+                            const files = e.target.files;
+                            if (!files) return;
+                            
+                            for (let i = 0; i < files.length; i++) {
+                              const formData = new FormData();
+                              formData.append('file', files[i]);
+                              try {
+                                const res = await fetch('/api/upload.php', { method: 'POST', body: formData });
+                                const data = await res.json();
+                                if (data.success) {
+                                  setNewProject(prev => ({
+                                    ...prev,
+                                    media: [...prev.media, { 
+                                      url: data.url, 
+                                      type: 'image', 
+                                      is_main: false, 
+                                      inputMode: 'upload' 
+                                    }]
+                                  }));
+                                }
+                              } catch (err) {
+                                console.error("Upload failed for file", i, err);
+                              }
+                            }
+                          };
+                          input.click();
+                        }}
+                        className="bg-blue-600 text-white px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest hover:bg-blue-700 transition-colors"
+                      >
+                        Bulk Upload Gallery
+                      </button>
+                      <button 
+                        type="button"
+                        onClick={handleAddMedia}
+                        className="bg-admin-black text-white px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest hover:bg-admin-orange transition-colors"
+                      >
+                        + Add Item
+                      </button>
+                    </div>
+
                   </div>
 
                   <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
