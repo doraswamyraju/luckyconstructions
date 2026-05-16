@@ -41,6 +41,12 @@ const HERO_SLIDES = [
 
 // Data is now fetched from the API
 
+const getImageUrl = (url: string) => {
+  if (!url) return "";
+  if (url.startsWith('http') || url.startsWith('https') || url.startsWith('/')) return url;
+  return `/uploads/${url}`;
+};
+
 export default function LandingPage() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [projectTab, setProjectTab] = useState<'completed' | 'progress'>('completed');
@@ -479,7 +485,7 @@ export default function LandingPage() {
                     onClick={() => setSelectedProject(project)}
                   >
                     <img 
-                      src={project.media?.find((m: any) => m.is_main)?.url || project.media?.[0]?.url || project.image_url || "https://images.unsplash.com/photo-1541888088320-b30fef6a3479?auto=format&fit=crop&q=80"} 
+                      src={getImageUrl(project.media?.find((m: any) => m.is_main)?.url || project.media?.[0]?.url || project.image_url || "https://images.unsplash.com/photo-1541888088320-b30fef6a3479?auto=format&fit=crop&q=80")} 
                       alt={project.title} 
                       className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-700"
                     />
@@ -508,7 +514,7 @@ export default function LandingPage() {
                     onClick={() => setSelectedProject(project)}
                   >
                     <img 
-                      src={project.media?.find((m: any) => m.is_main)?.url || project.media?.[0]?.url || project.image_url || "https://images.unsplash.com/photo-1531834685032-c34bf0d84c77?auto=format&fit=crop&q=80"} 
+                      src={getImageUrl(project.media?.find((m: any) => m.is_main)?.url || project.media?.[0]?.url || project.image_url || "https://images.unsplash.com/photo-1531834685032-c34bf0d84c77?auto=format&fit=crop&q=80")} 
                       alt={project.title} 
                       className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-700"
                     />
@@ -644,7 +650,7 @@ export default function LandingPage() {
                   <Link to={`/blog/${post.id}`}>
                     <div className="aspect-[16/10] overflow-hidden bg-gray-100 mb-6">
                       <img 
-                        src={post.image || "https://images.unsplash.com/photo-1541913080-21400ee8b244?auto=format&fit=crop&q=80&w=600"} 
+                        src={getImageUrl(post.image || "https://images.unsplash.com/photo-1541913080-21400ee8b244?auto=format&fit=crop&q=80&w=600")} 
                         alt={post.title}
                         className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700"
                       />

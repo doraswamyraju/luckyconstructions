@@ -5,6 +5,12 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { Link } from "react-router-dom";
 
+const getImageUrl = (url: string) => {
+  if (!url) return "";
+  if (url.startsWith('http') || url.startsWith('https') || url.startsWith('/')) return url;
+  return `/uploads/${url}`;
+};
+
 export default function BlogListPage() {
   const [blogs, setBlogs] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -61,7 +67,7 @@ export default function BlogListPage() {
                       <Link to={`/blog/${post.id}`}>
                         <div className="aspect-[16/10] overflow-hidden bg-gray-100 mb-6">
                           <img 
-                            src={post.image || "https://images.unsplash.com/photo-1541913080-21400ee8b244?auto=format&fit=crop&q=80&w=800"} 
+                            src={getImageUrl(post.image || "https://images.unsplash.com/photo-1541913080-21400ee8b244?auto=format&fit=crop&q=80&w=800")} 
                             alt={post.title}
                             className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700"
                           />
@@ -119,7 +125,7 @@ export default function BlogListPage() {
                   {blogs.slice(0, 3).map(post => (
                     <Link key={post.id} to={`/blog/${post.id}`} className="flex gap-4 group">
                       <div className="w-20 h-20 shrink-0 overflow-hidden bg-gray-100">
-                        <img src={post.image} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all" alt="" />
+                        <img src={getImageUrl(post.image)} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all" alt="" />
                       </div>
                       <div>
                         <h5 className="text-[10px] font-bold uppercase leading-tight group-hover:text-brand-gold transition-colors line-clamp-2">{post.title}</h5>

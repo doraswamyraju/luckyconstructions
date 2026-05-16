@@ -2,6 +2,12 @@ import { motion, AnimatePresence } from "motion/react";
 import { X, MapPin, Clock, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 
+const getImageUrl = (url: string) => {
+  if (!url) return "";
+  if (url.startsWith('http') || url.startsWith('https') || url.startsWith('/')) return url;
+  return `/uploads/${url}`;
+};
+
 interface ProjectDetailModalProps {
   project: any;
   onClose: () => void;
@@ -66,12 +72,12 @@ export default function ProjectDetailModal({ project, onClose }: ProjectDetailMo
                 {media[currentIndex].type === 'video' ? (
                   <div className="w-full h-full bg-black flex items-center justify-center">
                     <video controls className="w-full h-full object-contain" autoPlay muted loop>
-                      <source src={media[currentIndex].url} type="video/mp4" />
+                      <source src={getImageUrl(media[currentIndex].url)} type="video/mp4" />
                     </video>
                   </div>
                 ) : (
                   <img 
-                    src={media[currentIndex].url} 
+                    src={getImageUrl(media[currentIndex].url)} 
                     alt={project.title} 
                     className="w-full h-full object-cover"
                   />
