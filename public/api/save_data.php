@@ -35,12 +35,37 @@ try {
         }
         $allData[$type] = array_values(array_filter($allData[$type], function($item) use ($id) {
             return $item['id'] != $id;
-        exit;
-}
+        }));
+    } else if ($action === 'add') {
+        if ($dataToSave) {
+            $dataToSave['id'] = time();
+            $allData[$type][] = $dataToSave;
+        }
+    } else if ($action === 'update') {
+        if ($dataToSave) {
+            $found = false;
+            foreach ($allData[$type] as &$item) {
+                if ($item['id'] == $id) {
+                    $item = array_merge($item, $dataToSave);
+                    $found = true;
+                    break;
+                }
+            }
+            if (!$found) {
+                $dataToSave['id'] = $id ?: time();
+                $allData[$type][] = $dataToSave;
+            }
+        }
+    }
 
-if (file_put_contents($dataFile, json_encode($data, JSON_PRETTY_PRINT))) {
+    if (file_put_contents($dataFile, json_encode($allData, JSON_PRETTY_PRINT)) === false) {
+        throw new Exception('Failed to write to data.json. Check folder permissions.');
+    }
+
     echo json_encode(['success' => true]);
-} else {
-    echo json_encode(['success' => false, 'error' => 'Failed to save data']);
+
+} catch (Exception $e) {
+    http_response_code(500);
+    echo json_encode(['success' => false, 'error' => $e->getMessage()]);
 }
 ?>
