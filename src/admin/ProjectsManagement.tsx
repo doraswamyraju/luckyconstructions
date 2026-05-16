@@ -59,9 +59,13 @@ export default function ProjectsManagement() {
     setNewProject({ ...newProject, media: updatedMedia });
   };
 
+  const [isSaving, setIsSaving] = useState(false);
+
   const handleSaveProject = (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSaving(true);
     const action = editingProjectId ? 'update' : 'add';
+    
     fetch('/api/save_data.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -71,12 +75,29 @@ export default function ProjectsManagement() {
         data: { ...newProject, id: editingProjectId } 
       })
     })
-    .then(res => res.json())
+    .then(async res => {
+      const text = await res.text();
+      try {
+        return JSON.parse(text);
+      } catch (err) {
+        console.error("Server returned non-JSON response:", text);
+        throw new Error("Server error: " + text.substring(0, 100));
+      }
+    })
     .then(data => {
       if (data.success) {
         setIsAddModalOpen(false);
         fetchProjects();
+      } else {
+        alert("Error saving project: " + (data.error || "Unknown error"));
       }
+    })
+    .catch(err => {
+      console.error("Save error:", err);
+      alert("Failed to save project: " + err.message);
+    })
+    .finally(() => {
+      setIsSaving(false);
     });
   };
 
@@ -581,9 +602,10 @@ export default function ProjectsManagement() {
                 </button>
                 <button 
                   type="submit"
-                  className="flex-1 bg-admin-black text-white py-5 font-bold uppercase tracking-widest text-sm hover:bg-admin-orange transition-colors shadow-xl"
+                  disabled={isSaving}
+                  className="flex-1 bg-admin-black text-white py-5 font-bold uppercase tracking-widest text-sm hover:bg-admin-orange transition-colors shadow-xl disabled:opacity-50"
                 >
-                  Deploy Project Asset
+                  {isSaving ? 'Processing...' : 'Deploy Project Asset'}
                 </button>
               </div>
             </form>

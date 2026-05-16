@@ -1,46 +1,40 @@
 <?php
 header('Content-Type: application/json');
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: POST');
+header('Access-Control-Allow-Headers: Content-Type');
 
-$input = json_decode(file_get_contents('php://input'), true);
-$type = $input['type'] ?? '';
-$action = $input['action'] ?? '';
-$itemData = $input['data'] ?? [];
-$id = $input['id'] ?? null;
+try {
+    $dataFile = '../data.json';
+    if (!file_exists($dataFile)) {
+        file_put_contents($dataFile, json_encode(['projects' => [], 'testimonials' => [], 'blogs' => [], 'leads' => []]));
+    }
 
-$dataFile = '../data.json';
-if (!file_exists($dataFile)) {
-    echo json_encode(['success' => false, 'error' => 'Data file not found']);
-    exit;
-}
+    $input = file_get_contents('php://input');
+    $request = json_decode($input, true);
 
-$data = json_decode(file_get_contents($dataFile), true);
+    if (!$request) {
+        throw new Exception('Invalid JSON input: ' . $input);
+    }
 
-if (!isset($data[$type])) {
-    echo json_encode(['success' => false, 'error' => 'Invalid type']);
-    exit;
-}
+    $type = $request['type'] ?? '';
+    $action = $request['action'] ?? '';
+    $id = $request['id'] ?? ($request['data']['id'] ?? null);
+    $dataToSave = $request['data'] ?? null;
 
-switch ($action) {
-    case 'add':
-        $itemData['id'] = time(); // Simple ID generation
-        $data[$type][] = $itemData;
-        break;
-    case 'update':
-        foreach ($data[$type] as &$item) {
-            if ($item['id'] == $itemData['id']) {
-                $item = array_merge($item, $itemData);
-                break;
-            }
+    $json = file_get_contents($dataFile);
+    $allData = json_decode($json, true);
+
+    if (!$allData) {
+        $allData = ['projects' => [], 'testimonials' => [], 'blogs' => [], 'leads' => []];
+    }
+
+    if ($action === 'delete') {
+        if (!isset($allData[$type])) {
+            throw new Exception('Invalid type for deletion: ' . $type);
         }
-        break;
-    case 'delete':
-        $data[$type] = array_filter($data[$type], function($item) use ($id) {
+        $allData[$type] = array_values(array_filter($allData[$type], function($item) use ($id) {
             return $item['id'] != $id;
-        });
-        $data[$type] = array_values($data[$type]); // Re-index array
-        break;
-    default:
-        echo json_encode(['success' => false, 'error' => 'Invalid action']);
         exit;
 }
 
