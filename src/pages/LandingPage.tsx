@@ -575,22 +575,22 @@ export default function LandingPage() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.5, delay: (index % 3) * 0.1 }}
-                    className="bg-white p-8 h-full relative shadow-lg border border-gray-100 group hover:border-brand-gold/30 transition-all flex flex-col justify-between"
+                    className="bg-white p-6 h-[320px] relative shadow-lg border border-gray-100 group hover:border-brand-gold/30 transition-all flex flex-col justify-between"
                   >
                     <div>
-                      <div className="absolute top-0 right-0 w-12 h-12 bg-brand-gold/5 flex items-center justify-center">
-                        <Star className="text-brand-gold w-4 h-4" fill="currentColor" />
+                      <div className="absolute top-0 right-0 w-10 h-10 bg-brand-gold/5 flex items-center justify-center">
+                        <Star className="text-brand-gold w-3 h-3" fill="currentColor" />
                       </div>
-                      <div className="mb-6">
-                        <MessageCircle className="text-brand-gold/20 w-10 h-10 mb-4" />
-                        <p className="text-base text-gray-700 leading-relaxed italic line-clamp-6">
+                      <div className="mb-4">
+                        <MessageCircle className="text-brand-gold/10 w-8 h-8 mb-3" />
+                        <p className="text-sm text-gray-700 leading-relaxed italic line-clamp-[7]">
                           "{testimonial.text}"
                         </p>
                       </div>
                     </div>
-                    <div className="pt-6 border-t border-gray-50">
-                      <h4 className="font-display text-base font-bold text-brand-black uppercase tracking-tight mb-1">{testimonial.name}</h4>
-                      <p className="text-brand-gold text-[10px] font-bold uppercase tracking-widest">{testimonial.role}</p>
+                    <div className="pt-4 border-t border-gray-50">
+                      <h4 className="font-display text-sm font-bold text-brand-black uppercase tracking-tight mb-0.5">{testimonial.name}</h4>
+                      <p className="text-brand-gold text-[9px] font-bold uppercase tracking-widest">{testimonial.role}</p>
                     </div>
                   </motion.div>
                 </div>
