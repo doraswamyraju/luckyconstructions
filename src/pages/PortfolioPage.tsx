@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "motion/react";
 import ProjectDetailModal from "../components/ProjectDetailModal";
 import Header from "../components/Header";
 import Footer from "../components/Footer";

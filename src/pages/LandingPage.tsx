@@ -1,3 +1,6 @@
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence, useScroll, useTransform } from "motion/react";
+import { Hammer, HardHat, Compass, Ruler, Building2, MapPin, Phone, Mail, ChevronRight, MessageCircle, ArrowUp, Star, Lock } from "lucide-react";
 import ProjectDetailModal from "../components/ProjectDetailModal";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
