@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import ProjectDetailModal from "../components/ProjectDetailModal";
 
 export default function PortfolioPage() {
   const [projects, setProjects] = useState<any[]>([]);
@@ -210,57 +211,13 @@ export default function PortfolioPage() {
         </div>
       </footer>
 
-      {/* Detail Modal (Exact copy from LandingPage) */}
+      {/* Detail Modal */}
       <AnimatePresence>
         {selectedProject && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8">
-            <div className="absolute inset-0 bg-brand-black/95 backdrop-blur-md" onClick={() => setSelectedProject(null)} />
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              className="relative bg-white text-brand-black w-full max-w-6xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl"
-            >
-              <button onClick={() => setSelectedProject(null)} className="absolute top-6 right-6 z-50 p-2 bg-brand-black text-white hover:bg-brand-gold hover:text-brand-black transition-colors">
-                <X size={24} />
-              </button>
-              
-              <div className="flex flex-col md:flex-row h-full">
-                <div className="md:w-3/5 bg-gray-100 overflow-y-auto p-4 space-y-4 custom-scrollbar">
-                   {selectedProject.media && selectedProject.media.length > 0 ? (
-                      selectedProject.media.map((m: any, i: number) => (
-                        <div key={i} className="w-full">
-                          {m.type === 'video' ? (
-                            <video controls className="w-full h-auto"><source src={m.url} /></video>
-                          ) : (
-                            <img src={m.url} className="w-full h-auto" />
-                          )}
-                        </div>
-                      ))
-                   ) : (
-                     <img src={selectedProject.image_url} className="w-full h-auto" />
-                   )}
-                </div>
-                
-                <div className="md:w-2/5 p-8 md:p-12 overflow-y-auto">
-                  <div className="text-brand-gold font-bold uppercase text-xs tracking-[0.2em] mb-4">{selectedProject.category}</div>
-                  <h2 className="text-3xl md:text-4xl font-display font-bold uppercase tracking-tight mb-8 leading-tight">{selectedProject.title}</h2>
-                  <p className="text-gray-600 mb-10 leading-relaxed font-medium">{selectedProject.description || "Lucky Constructions project delivery."}</p>
-                  
-                  <div className="grid grid-cols-2 gap-8 border-t border-gray-100 pt-10">
-                    <div className="space-y-1">
-                      <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Location</div>
-                      <div className="font-bold flex items-center gap-2 text-sm uppercase"><MapPin size={14} className="text-brand-gold" /> {selectedProject.location}</div>
-                    </div>
-                    <div className="space-y-1">
-                      <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Completed</div>
-                      <div className="font-bold flex items-center gap-2 text-sm uppercase"><Calendar size={14} className="text-brand-gold" /> {selectedProject.year}</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </div>
+          <ProjectDetailModal 
+            project={selectedProject} 
+            onClose={() => setSelectedProject(null)} 
+          />
         )}
       </AnimatePresence>
     </div>

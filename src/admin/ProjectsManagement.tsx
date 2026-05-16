@@ -93,6 +93,8 @@ export default function ProjectsManagement() {
       processedUpdates.is_featured = Number(processedUpdates.is_featured);
     }
 
+    console.log("Saving project manually:", { id, processedUpdates });
+
     fetch('/api/save_data.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -104,6 +106,7 @@ export default function ProjectsManagement() {
     })
     .then(res => res.json())
     .then(data => {
+      console.log("Save response:", data);
       if (data.success) {
         fetchProjects();
       } else {
@@ -280,6 +283,7 @@ export default function ProjectsManagement() {
                     completion_percentage: project.completion_percentage,
                     year: project.year,
                     description: project.description,
+                    is_featured: project.is_featured,
                     media: project.media || []
                   });
                   setEditingProjectId(project.id);

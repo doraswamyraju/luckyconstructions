@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence, useScroll, useTransform } from "motion/react";
 import { Menu, X, ArrowRight, Hammer, HardHat, Compass, Ruler, Building2, Phone, Mail, MapPin, Star, ChevronRight, ShieldCheck, Clock, Users, Lock, MessageCircle, ArrowUp } from "lucide-react";
+import ProjectDetailModal from "../components/ProjectDetailModal";
 
 const NAV_LINKS = [
   { name: "Home", href: "#home" },
@@ -58,9 +59,24 @@ export default function LandingPage() {
       .then(res => res.json())
       .then(data => {
         if (!data.error) {
-          // Only show top 3 featured projects on landing page
-          const featured = data.filter((p: any) => p.is_featured == 1).slice(0, 3);
-          setDbProjects(featured);
+          const featured = data.filter((p: any) => p.is_featured == 1);
+          
+          if (featured.length > 0) {
+            // If we have starred projects, show them (limit to 3 or 6 depending on design, let's keep it flexible)
+            setDbProjects(featured);
+          } else {
+            // Fallback: Latest 3 Completed and Latest 3 Ongoing
+            const latestCompleted = data
+              .filter((p: any) => p.status === 'Completed')
+              .sort((a: any, b: any) => b.id - a.id) // Assuming higher ID is later
+              .slice(0, 3);
+            const latestOngoing = data
+              .filter((p: any) => p.status === 'Ongoing')
+              .sort((a: any, b: any) => b.id - a.id)
+              .slice(0, 3);
+            
+            setDbProjects([...latestCompleted, ...latestOngoing]);
+          }
         }
       })
       .catch(err => console.error("Error fetching projects:", err));
@@ -584,101 +600,10 @@ export default function LandingPage() {
         {/* Project Detail Modal */}
         <AnimatePresence>
           {selectedProject && (
-            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8">
-              <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="absolute inset-0 bg-brand-black/95 backdrop-blur-md"
-                onClick={() => setSelectedProject(null)}
-              />
-              <motion.div 
-                initial={{ opacity: 0, scale: 0.9, y: 20 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                className="relative bg-white text-brand-black w-full max-w-6xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl"
-              >
-                <button 
-                  onClick={() => setSelectedProject(null)}
-                  className="absolute top-6 right-6 z-50 p-2 bg-brand-black text-white hover:bg-brand-gold hover:text-brand-black transition-colors"
-                >
-                  <X size={24} />
-                </button>
-
-                <div className="grid grid-cols-1 lg:grid-cols-2 h-full overflow-y-auto lg:overflow-hidden">
-                  {/* Gallery Area */}
-                  <div className="bg-gray-100 h-[400px] lg:h-auto relative overflow-y-auto p-4 space-y-4 custom-scrollbar">
-                    {selectedProject.media && selectedProject.media.length > 0 ? (
-                      selectedProject.media.map((m: any, i: number) => (
-                        <div key={i} className="relative group">
-                          {m.type === 'video' ? (
-                            <div className="aspect-video bg-black flex items-center justify-center group">
-                               <video controls className="w-full h-full object-contain">
-                                 <source src={m.url} type="video/mp4" />
-                               </video>
-                            </div>
-                          ) : (
-                            <img src={m.url} alt={`Project media ${i}`} className="w-full h-auto object-cover" />
-                          )}
-                        </div>
-                      ))
-                    ) : (
-                      <img src={selectedProject.image_url} alt={selectedProject.title} className="w-full h-full object-cover" />
-                    )}
-                  </div>
-
-                  {/* Details Area */}
-                  <div className="p-8 md:p-12 flex flex-col justify-between bg-white">
-                    <div>
-                      <div className="flex items-center gap-3 mb-6">
-                        <span className="bg-brand-gold text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1.5">
-                          {selectedProject.category}
-                        </span>
-                        <span className="text-gray-400 text-[10px] font-bold uppercase tracking-widest">
-                          Project ID: LC-00{selectedProject.id}
-                        </span>
-                      </div>
-
-                      <h3 className="text-2xl md:text-3xl font-display font-bold uppercase tracking-tight leading-[1.1]">
-                        {selectedProject.title}
-                      </h3>
-
-                      <div className="space-y-4">
-                        <p className="text-gray-600 text-sm leading-relaxed">
-                          {selectedProject.description || "Lucky Constructions delivered this project with a focus on structural integrity and architectural finesse. Every detail was meticulously planned and executed by our senior engineering team."}
-                        </p>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-8 pt-8 border-t border-gray-100">
-                        <div>
-                          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Location</p>
-                          <div className="flex items-center gap-2 font-bold text-xs">
-                            <MapPin size={14} className="text-brand-gold" />
-                            {selectedProject.location}
-                          </div>
-                        </div>
-                        <div>
-                          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Completion</p>
-                          <div className="flex items-center gap-2 font-bold text-xs">
-                            <Clock size={14} className="text-brand-gold" />
-                            {selectedProject.status === 'Completed' ? selectedProject.year : `${selectedProject.completion_percentage}% Done`}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="mt-12">
-                      <button 
-                        onClick={() => setSelectedProject(null)}
-                        className="w-full bg-brand-black text-white py-4 font-bold uppercase tracking-widest text-sm hover:bg-brand-gold hover:text-brand-black transition-colors flex items-center justify-center gap-2"
-                      >
-                        Back to Portfolio
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            </div>
+            <ProjectDetailModal 
+              project={selectedProject} 
+              onClose={() => setSelectedProject(null)} 
+            />
           )}
         </AnimatePresence>
       </section>
